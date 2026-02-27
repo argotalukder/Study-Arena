@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Create New Group</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#22C55E",
+                        "background-dark": "#121212",
+                        "input-dark": "#1E1E1E",
+                        "card-border": "#2d2d2d",
+                        "toggle-dark": "#2A2A2A",
+                    },
+                    fontFamily: { "display":["Lexend", "sans-serif"] }
+                }
+            }
+        }
+    </script>
+    <style> body { font-family: 'Lexend', sans-serif; -webkit-tap-highlight-color: transparent; } </style>
+</head>
+<body class="bg-black text-white antialiased selection:bg-primary selection:text-white flex justify-center min-h-screen">
+    
+    <div class="w-full max-w-md bg-background-dark min-h-[100dvh] flex flex-col relative shadow-2xl overflow-hidden border-x border-card-border/30">
+        
+        <div class="flex items-center px-4 py-4 sticky top-0 z-10 border-b border-card-border bg-background-dark/95 backdrop-blur-sm">
+            <a href="groups.html" class="flex size-10 items-center justify-center rounded-full hover:bg-input-dark text-white transition-colors">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </a>
+            <h2 class="flex-1 text-center text-[18px] font-bold pr-10">Create New Group</h2>
+        </div>
+
+        <main class="flex-1 px-6 py-6 overflow-y-auto pb-24">
+            
+            <!-- Group Image Upload Section -->
+            <div class="flex flex-col items-center justify-center mb-6">
+                <div class="relative group cursor-pointer" id="avatar-container">
+                    <input type="file" id="group-image-input" class="hidden" accept="image/*" />
+                    <div id="avatar-preview" class="w-24 h-24 rounded-[1.5rem] bg-input-dark flex items-center justify-center border-2 border-dashed border-gray-600 group-hover:border-primary transition-all overflow-hidden bg-cover bg-center">
+                        <span id="avatar-icon" class="material-symbols-outlined text-4xl text-gray-500 group-hover:text-primary transition-colors">add_a_photo</span>
+                    </div>
+                    <div class="absolute -bottom-2 -right-2 bg-background-dark rounded-full p-1">
+                        <div class="bg-primary text-white rounded-full p-1.5 shadow-lg flex items-center justify-center">
+                            <span class="material-symbols-outlined text-[16px]">edit</span>
+                        </div>
+                    </div>
+                    <!-- Uploading Loader -->
+                    <div id="upload-loader" class="absolute inset-0 bg-black/60 rounded-[1.5rem] flex items-center justify-center hidden">
+                        <div class="w-6 h-6 border-2 border-white border-t-primary rounded-full animate-spin"></div>
+                    </div>
+                </div>
+                <p id="upload-status" class="mt-4 text-[13px] font-medium text-gray-400">Add Group Icon</p>
+            </div>
+
+            <form id="create-group-form" class="space-y-5">
+                <label class="block">
+                    <span class="text-[13px] font-bold text-gray-300 mb-1.5 block uppercase tracking-wider">Group Name *</span>
+                    <input id="group-name" required class="w-full h-12 px-4 rounded-xl bg-input-dark border border-card-border focus:border-primary focus:ring-1 focus:ring-primary text-white placeholder:text-gray-500 font-medium text-[15px]" placeholder="e.g. HSC Physics Batch 2025" type="text"/>
+                </label>
+
+                <label class="block">
+                    <span class="text-[13px] font-bold text-gray-300 mb-1.5 block uppercase tracking-wider">Category</span>
+                    <div class="relative">
+                        <select id="group-category" class="w-full h-12 px-4 pr-10 rounded-xl bg-input-dark border border-card-border focus:border-primary text-white appearance-none font-medium text-[15px]">
+                            <option value="Physics">Physics</option>
+                            <option value="Math">Math</option>
+                            <option value="English">English</option>
+                            <option value="Programming">Programming</option>
+                            <option value="Mixed" selected>Mixed</option>
+                        </select>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none material-symbols-outlined text-gray-400">expand_more</span>
+                    </div>
+                </label>
+
+                <label class="block">
+                    <span class="text-[13px] font-bold text-gray-300 mb-1.5 block uppercase tracking-wider">Description</span>
+                    <textarea id="group-desc" class="w-full p-4 rounded-xl bg-input-dark border border-card-border focus:border-primary text-white resize-none h-24 font-medium text-[15px]" placeholder="Group details..."></textarea>
+                </label>
+
+                <div class="block">
+                    <span class="text-[13px] font-bold text-gray-300 mb-2 block uppercase tracking-wider">Privacy Type</span>
+                    <div class="grid grid-cols-2 gap-3 p-1 bg-input-dark border border-card-border rounded-xl">
+                        <label class="cursor-pointer">
+                            <input class="peer sr-only" name="privacy" type="radio" value="public" checked/>
+                            <div class="flex items-center justify-center gap-2 py-2.5 rounded-lg text-gray-400 peer-checked:bg-toggle-dark peer-checked:text-white transition-all shadow-sm">
+                                <span class="material-symbols-outlined text-[20px]">public</span>
+                                <span class="font-bold text-[14px]">Public</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input class="peer sr-only" name="privacy" type="radio" value="private"/>
+                            <div class="flex items-center justify-center gap-2 py-2.5 rounded-lg text-gray-400 peer-checked:bg-toggle-dark peer-checked:text-white transition-all shadow-sm">
+                                <span class="material-symbols-outlined text-[20px]">lock</span>
+                                <span class="font-bold text-[14px]">Private</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" id="submit-btn" class="w-full h-14 bg-primary hover:bg-primary-dark text-white font-bold text-[16px] rounded-2xl shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-8">
+                    <span class="material-symbols-outlined">group_add</span>
+                    Create Group
+                </button>
+            </form>
+        </main>
+    </div>
+
+    <!-- Firebase Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDofDHfJvIKQmTtlg7x99mBtimuMmUUhBY",
+            authDomain: "facebook-379b3.firebaseapp.com",
+            projectId: "facebook-379b3",
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        onAuthStateChanged(auth, (user) => {
+            if (user) { currentUser = user; } 
+            else { window.location.href = "index.html"; }
+        });
+
+        // IMGBB Image Upload Logic
+        let uploadedImageUrl = "";
+        const imgbbApiKey = "957a2f2e8fc22269da1f2045b3f25eab";
+        
+        const avatarContainer = document.getElementById("avatar-container");
+        const imageInput = document.getElementById("group-image-input");
+        const avatarPreview = document.getElementById("avatar-preview");
+        const avatarIcon = document.getElementById("avatar-icon");
+        const uploadLoader = document.getElementById("upload-loader");
+        const uploadStatus = document.getElementById("upload-status");
+
+        avatarContainer.addEventListener("click", () => imageInput.click());
+
+        imageInput.addEventListener("change", async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Show Local Preview
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                avatarPreview.style.backgroundImage = `url(${event.target.result})`;
+                avatarIcon.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+
+            // Upload to ImgBB
+            uploadLoader.classList.remove("hidden");
+            uploadStatus.innerText = "Uploading image...";
+            uploadStatus.classList.replace("text-gray-400", "text-primary");
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                const response = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    uploadedImageUrl = data.data.url;
+                    uploadStatus.innerText = "Image uploaded successfully!";
+                    setTimeout(() => { uploadStatus.innerText = "Group Icon"; uploadStatus.classList.replace("text-primary", "text-gray-400"); }, 2000);
+                } else {
+                    alert("Failed to upload image.");
+                    uploadStatus.innerText = "Upload failed! Try again.";
+                    uploadStatus.classList.replace("text-primary", "text-red-500");
+                }
+            } catch (error) {
+                console.error("Error uploading:", error);
+                alert("An error occurred while uploading.");
+            } finally {
+                uploadLoader.classList.add("hidden");
+            }
+        });
+
+        // Form Submit
+        document.getElementById("create-group-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById("submit-btn");
+            btn.innerHTML = `<div class="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Creating...`;
+            btn.disabled = true;
+
+            try {
+                const name = document.getElementById("group-name").value;
+                const category = document.getElementById("group-category").value;
+                const desc = document.getElementById("group-desc").value;
+                const privacy = document.querySelector('input[name="privacy"]:checked').value;
+
+                // Save to Firestore 'groups' collection
+                await addDoc(collection(db, "groups"), {
+                    name: name,
+                    category: category,
+                    description: desc,
+                    privacy: privacy,
+                    groupIcon: uploadedImageUrl, // Save ImgBB URL here
+                    createdBy: currentUser.uid,
+                    creatorName: currentUser.displayName || "User",
+                    memberCount: 1,
+                    members:[currentUser.uid],
+                    createdAt: serverTimestamp()
+                });
+
+                window.location.href = "groups.html";
+            } catch (error) {
+                console.error("Error creating group:", error);
+                alert("Failed to create group.");
+                btn.innerHTML = `<span class="material-symbols-outlined">group_add</span> Create Group`;
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

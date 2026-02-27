@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Active Video Call</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#22C55E",
+                        "background-dark": "#121212",
+                        "surface-dark": "#1E1E1E",
+                    },
+                    fontFamily: { "display": ["Lexend", "sans-serif"] }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-dark font-display text-white min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 pt-4">
+        <button class="flex items-center justify-center w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm">
+            <span class="material-symbols-outlined">expand_more</span>
+        </button>
+        <div class="flex items-center gap-2 bg-black/40 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10">
+            <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+            <span class="text-sm font-medium">Physics Discussion</span>
+        </div>
+        <button class="flex items-center justify-center w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm">
+            <span class="material-symbols-outlined">person_add</span>
+        </button>
+    </header>
+
+    <!-- Video Grid -->
+    <main class="flex-1 grid grid-cols-2 gap-4 p-4 pt-20 content-center">
+        
+        <!-- Local User (REAL CAMERA) -->
+        <div class="relative bg-surface-dark rounded-2xl overflow-hidden aspect-[3/4] border-2 border-primary shadow-lg shadow-primary/20">
+            <!-- This Video Element will show REAL Camera -->
+            <video id="local-video" autoplay muted playsinline class="w-full h-full object-cover transform scale-x-[-1]"></video>
+            
+            <div class="absolute bottom-3 left-3 bg-black/50 px-2 py-1 rounded text-xs font-bold">You</div>
+            <div id="mic-status" class="absolute top-3 right-3 bg-primary p-1 rounded-full">
+                <span class="material-symbols-outlined text-[14px]">mic</span>
+            </div>
+        </div>
+
+        <!-- Remote User (Simulation) -->
+        <div class="relative bg-surface-dark rounded-2xl overflow-hidden aspect-[3/4] border border-white/5">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAM6i-2FarNrjt46RX1rgrktB_EmIqmIlnS-FEAw3bxYqrMGTjRJPXSlNe2rC9ZbytFRVftLMhlFL86W2novQh7mRJIsr0CPA5LsHAc9glTHyF00yNEwm2cFt3H1TaZvuVscQj1cBb9-fiDOYQ_eyEmf0nQpnzjEaxxWD064R3gRfl1MyNYXfail6xHgkVRVuGPow2FmC0SqibQXpknBRoNxuliTnF-8GnnLZgDFRa5zU6MDQDudtBo1E7GG2J6Bwgti6o_oQeWh6_5" class="w-full h-full object-cover opacity-80">
+            <div class="absolute bottom-3 left-3 bg-black/50 px-2 py-1 rounded text-xs">Rahim</div>
+            <div class="absolute bottom-3 right-3 flex gap-1">
+                <span class="w-1 h-3 bg-primary animate-pulse"></span>
+                <span class="w-1 h-5 bg-primary animate-pulse delay-75"></span>
+                <span class="w-1 h-2 bg-primary animate-pulse delay-150"></span>
+            </div>
+        </div>
+
+        <!-- Remote User 2 -->
+        <div class="relative bg-surface-dark rounded-2xl overflow-hidden aspect-[3/4] border border-white/5">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6sWfxD5kq8YFwZDluY5eqVX6rPSEfnVLu6nf1cEotzb925n0-aF9Z4yQDtHxzi8PqtEpj4uBWrxy8ZCLEFD9yJWTSWoncFDWwYM49VINJSj5ioLfTtcO1yDfVduTLXtrRJW1ZjRa-ji5vjV--20K7kP5ugvEYnKmTxgRVuIjnQRnYvvCwLOth14NM0yx7Mf6yhB8h43Z041_X7qUobF0yTLjAgH1Es8HXQ-StFuUdjfFvwrtYa8R6h8bKVqsi2COWY_aMZ66Fwlj1" class="w-full h-full object-cover opacity-80">
+            <div class="absolute bottom-3 left-3 bg-black/50 px-2 py-1 rounded text-xs">Fatima</div>
+        </div>
+
+        <!-- Remote User 3 -->
+        <div class="relative bg-surface-dark rounded-2xl overflow-hidden aspect-[3/4] border border-white/5 flex items-center justify-center">
+            <div class="w-16 h-16 rounded-full bg-purple-600 flex items-center justify-center text-xl font-bold">ZR</div>
+            <div class="absolute bottom-3 left-3 bg-black/50 px-2 py-1 rounded text-xs">Zara</div>
+        </div>
+
+    </main>
+
+    <!-- Controls -->
+    <div class="absolute bottom-8 left-0 right-0 flex justify-center z-30">
+        <div class="bg-surface-dark/90 backdrop-blur-xl border border-white/10 rounded-full px-4 py-3 flex items-center gap-4 shadow-2xl">
+            <button id="btn-mic" class="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all">
+                <span class="material-symbols-outlined">mic</span>
+            </button>
+            <button id="btn-video" class="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all">
+                <span class="material-symbols-outlined">videocam</span>
+            </button>
+            <button onclick="endCall()" class="w-14 h-14 rounded-full bg-red-600 hover:bg-red-700 flex items-center justify-center shadow-lg transition-all active:scale-95">
+                <span class="material-symbols-outlined text-2xl font-variation-settings-fill">call_end</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Access Real Camera & Microphone
+        async function startCall() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                const videoElement = document.getElementById('local-video');
+                videoElement.srcObject = stream;
+                
+                window.localStream = stream; // Save stream to global variable
+            } catch (error) {
+                console.error("Error accessing media devices.", error);
+                alert("Camera access denied or not found!");
+            }
+        }
+
+        // Toggle Mic
+        document.getElementById('btn-mic').addEventListener('click', function() {
+            const audioTracks = window.localStream.getAudioTracks();
+            if (audioTracks.length > 0) {
+                const enabled = !audioTracks[0].enabled;
+                audioTracks[0].enabled = enabled;
+                
+                this.classList.toggle('bg-red-500', !enabled);
+                this.innerHTML = enabled ? 
+                    '<span class="material-symbols-outlined">mic</span>' : 
+                    '<span class="material-symbols-outlined">mic_off</span>';
+                
+                // Update small icon
+                const statusIcon = document.getElementById('mic-status');
+                statusIcon.innerHTML = enabled ? 
+                    '<span class="material-symbols-outlined text-[14px]">mic</span>' : 
+                    '<span class="material-symbols-outlined text-[14px]">mic_off</span>';
+                statusIcon.className = enabled ? 'absolute top-3 right-3 bg-primary p-1 rounded-full' : 'absolute top-3 right-3 bg-red-500 p-1 rounded-full';
+            }
+        });
+
+        // Toggle Video
+        document.getElementById('btn-video').addEventListener('click', function() {
+            const videoTracks = window.localStream.getVideoTracks();
+            if (videoTracks.length > 0) {
+                const enabled = !videoTracks[0].enabled;
+                videoTracks[0].enabled = enabled;
+                
+                this.classList.toggle('bg-red-500', !enabled);
+                this.innerHTML = enabled ? 
+                    '<span class="material-symbols-outlined">videocam</span>' : 
+                    '<span class="material-symbols-outlined">videocam_off</span>';
+            }
+        });
+
+        // End Call Logic
+        function endCall() {
+            // Stop all tracks
+            if(window.localStream) {
+                window.localStream.getTracks().forEach(track => track.stop());
+            }
+            window.history.back(); // Go back to previous page
+        }
+
+        // Initialize Call
+        startCall();
+    </script>
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Group Preview</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#22C55E", 
+                        "background-dark": "#121212",
+                        "surface-dark": "#1E1E1E",
+                        "card-border": "#2A2A2A",
+                    },
+                    fontFamily: { "display":["Lexend", "sans-serif"] },
+                },
+            },
+        }
+    </script>
+    <style> body { font-family: 'Lexend', sans-serif; -webkit-tap-highlight-color: transparent; } </style>
+</head>
+<body class="bg-black text-white antialiased flex justify-center min-h-screen">
+    <div class="w-full max-w-md bg-background-dark min-h-[100dvh] flex flex-col relative shadow-2xl border-x border-card-border/30 overflow-hidden">
+        
+        <header class="flex items-center justify-between px-4 py-3 bg-surface-dark border-b border-card-border z-20 sticky top-0">
+            <button onclick="history.back()" class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-card-border transition-colors text-gray-300">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </button>
+            <h1 class="text-base font-bold text-white leading-tight">Group Preview</h1>
+            <div class="w-10"></div>
+        </header>
+
+        <div id="loader" class="flex flex-col items-center justify-center flex-1">
+            <div class="w-8 h-8 border-4 border-card-border border-t-primary rounded-full animate-spin mb-3"></div>
+            <p class="text-gray-400 text-sm">Checking status...</p>
+        </div>
+
+        <!-- Content Area (Hidden Initially) -->
+        <main id="preview-content" class="flex-1 overflow-y-auto hidden flex flex-col">
+            <div class="relative w-full h-40 bg-gradient-to-b from-surface-dark to-background-dark flex flex-col items-center justify-center pt-4">
+                <div id="group-avatar" class="w-20 h-20 rounded-full bg-card-border bg-center bg-cover shrink-0 border-4 border-background-dark shadow-lg relative z-10 flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined text-[32px]">category</span>
+                </div>
+                <div id="private-lock-badge" class="absolute z-20 mt-14 ml-14 bg-primary text-black rounded-full p-1 border-[3px] border-background-dark hidden">
+                    <span class="material-symbols-outlined text-[16px] block font-bold">lock</span>
+                </div>
+            </div>
+
+            <div class="px-6 pb-6 -mt-8 relative z-20 flex flex-col items-center text-center">
+                <h2 id="group-name" class="text-xl font-bold text-white mt-2">Loading...</h2>
+                <div class="flex items-center gap-1.5 mt-2 bg-card-border px-3 py-1 rounded-full border border-[#333]">
+                    <span id="privacy-icon" class="material-symbols-outlined text-gray-400 text-sm">public</span>
+                    <span id="privacy-text" class="text-xs text-gray-300 font-medium uppercase tracking-wide">...</span>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3 w-full mt-6">
+                    <div class="bg-surface-dark border border-card-border rounded-xl p-3 flex flex-col items-center">
+                        <span id="member-count" class="text-lg font-bold text-white">0</span>
+                        <span class="text-[10px] text-gray-400 uppercase font-medium">Members</span>
+                    </div>
+                    <div class="bg-surface-dark border border-card-border rounded-xl p-3 flex flex-col items-center">
+                        <span class="text-lg font-bold text-white">Active</span>
+                        <span class="text-[10px] text-gray-400 uppercase font-medium">Status</span>
+                    </div>
+                </div>
+
+                <div class="w-full mt-6 text-left space-y-2">
+                    <h3 class="text-sm font-semibold text-gray-300">About this group</h3>
+                    <p id="group-desc" class="text-sm text-gray-400 leading-relaxed">No description provided.</p>
+                </div>
+            </div>
+
+            <div id="private-blur-area" class="flex-1 relative overflow-hidden bg-background-dark mt-2 hidden">
+                <div class="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-t from-background-dark via-background-dark/80 to-transparent z-10 px-6 text-center">
+                    <div class="w-16 h-16 bg-surface-dark rounded-full flex items-center justify-center mb-4 shadow-xl border border-card-border">
+                        <span class="material-symbols-outlined text-primary text-3xl">lock</span>
+                    </div>
+                    <h3 class="text-white font-semibold text-lg mb-2">This group is private</h3>
+                    <p class="text-gray-400 text-sm max-w-[240px]">Join to participate.</p>
+                </div>
+            </div>
+            <div class="h-28"></div>
+        </main>
+
+        <div id="action-area" class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-background-dark via-background-dark to-transparent pt-12 pb-6 px-6 z-30 hidden">
+            <button id="action-btn" class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-4 rounded-2xl shadow-lg shadow-primary/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2 mb-2">
+                <span id="action-icon" class="material-symbols-outlined">group_add</span>
+                <span id="action-text">Join Group</span>
+            </button>
+            <p id="action-hint" class="text-center text-xs text-gray-500 font-medium">Join instantly to start studying.</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc, arrayUnion, increment, addDoc, collection, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDofDHfJvIKQmTtlg7x99mBtimuMmUUhBY",
+            authDomain: "facebook-379b3.firebaseapp.com",
+            projectId: "facebook-379b3",
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const groupId = urlParams.get('id');
+
+        let currentUser = null;
+        let currentUserData = null;
+        let groupData = null;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) { 
+                currentUser = user;
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                currentUserData = userDoc.exists() ? userDoc.data() : { fullName: "User", photoURL: "" };
+                loadGroupDetails(); 
+            } else { 
+                window.location.href = "/auth"; 
+            }
+        });
+
+        async function loadGroupDetails() {
+            if (!groupId) { alert("Invalid ID"); return history.back(); }
+            const groupRef = doc(db, "groups", groupId);
+            const groupSnap = await getDoc(groupRef);
+
+            if (!groupSnap.exists()) { alert("Group not found!"); return history.back(); }
+            groupData = groupSnap.data();
+
+            // *** CRITICAL LOGIC ***
+            // If already member (includes Admin), Redirect to Chat Immediately
+            if (groupData.members && groupData.members.includes(currentUser.uid)) {
+                window.location.replace(`/group-chat?id=${groupId}`);
+                return;
+            }
+
+            // --- Render Preview for Non-Members Only ---
+            document.getElementById("group-name").innerText = groupData.name;
+            document.getElementById("group-desc").innerText = groupData.description || "No description provided.";
+            document.getElementById("member-count").innerText = groupData.memberCount || 1;
+            
+            if(groupData.groupIcon) {
+                document.getElementById("group-avatar").style.backgroundImage = `url('${groupData.groupIcon}')`;
+                document.getElementById("group-avatar").innerHTML = '';
+            }
+
+            const isPublic = groupData.privacy === 'public';
+            document.getElementById("privacy-icon").innerText = isPublic ? 'public' : 'shield';
+            document.getElementById("privacy-text").innerText = isPublic ? 'Public Group' : 'Private Group';
+
+            // Button Logic
+            const btn = document.getElementById("action-btn");
+            const btnText = document.getElementById("action-text");
+            const btnIcon = document.getElementById("action-icon");
+            const hint = document.getElementById("action-hint");
+
+            if (isPublic) {
+                btnText.innerText = "Join Group";
+                hint.innerText = "Public group. Join instantly.";
+                btn.onclick = joinPublicGroup;
+            } else {
+                document.getElementById("private-lock-badge").classList.remove("hidden");
+                document.getElementById("private-blur-area").classList.remove("hidden");
+                btnText.innerText = "Request to Join";
+                btnIcon.innerText = "send";
+                hint.innerText = "Admin approval required.";
+                btn.onclick = requestPrivateJoin;
+                checkExistingRequest();
+            }
+
+            document.getElementById("loader").classList.add("hidden");
+            document.getElementById("preview-content").classList.remove("hidden");
+            document.getElementById("action-area").classList.remove("hidden");
+        }
+
+        async function joinPublicGroup() {
+            const btn = document.getElementById("action-btn");
+            btn.innerHTML = `<div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>`;
+            try {
+                await updateDoc(doc(db, "groups", groupId), {
+                    members: arrayUnion(currentUser.uid),
+                    memberCount: increment(1)
+                });
+                window.location.href = `/group-chat?id=${groupId}`;
+            } catch(e) { console.error(e); alert("Failed to join."); }
+        }
+
+        async function requestPrivateJoin() {
+            const btn = document.getElementById("action-btn");
+            btn.innerHTML = `<div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>`;
+            try {
+                await addDoc(collection(db, "notifications"), {
+                    type: "join_request",
+                    groupId: groupId,
+                    groupName: groupData.name,
+                    senderId: currentUser.uid,
+                    senderName: currentUserData.fullName || "User",
+                    senderPhoto: currentUserData.photoURL || `https://ui-avatars.com/api/?name=User&background=random`,
+                    recipientId: groupData.createdBy,
+                    status: "pending",
+                    createdAt: serverTimestamp()
+                });
+                btn.innerHTML = `<span class="material-symbols-outlined">check_circle</span> Request Sent`;
+                btn.disabled = true;
+                btn.classList.add("opacity-50", "cursor-not-allowed");
+            } catch(e) { console.error(e); alert("Failed to send."); }
+        }
+
+        async function checkExistingRequest() {
+            const q = query(collection(db, "notifications"), 
+                where("groupId", "==", groupId), 
+                where("senderId", "==", currentUser.uid),
+                where("status", "==", "pending")
+            );
+            const snap = await getDocs(q);
+            if(!snap.empty) {
+                const btn = document.getElementById("action-btn");
+                btn.disabled = true;
+                btn.classList.add("opacity-50", "cursor-not-allowed");
+                document.getElementById("action-text").innerText = "Request Sent";
+                document.getElementById("action-icon").innerText = "check_circle";
+            }
+        }
+    </script>
+</body>
+</html>

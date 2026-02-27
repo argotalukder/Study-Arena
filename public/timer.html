@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>FocusGroup - Study Timer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#22C55E",
+                        "primary-dark": "#16a34a",
+                        "background-dark": "#121212",
+                        "surface-dark": "#1E1E1E",
+                        "surface-darker": "#181818",
+                        "input-dark": "#2A2A2A",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body { font-family: 'Lexend', sans-serif; -webkit-tap-highlight-color: transparent; min-height: max(884px, 100dvh); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-background-dark font-display text-white min-h-screen flex flex-col overflow-x-hidden antialiased">
+
+    <!-- Header -->
+    <div class="sticky top-0 z-10 bg-background-dark/90 backdrop-blur-md px-4 pt-4 pb-2 border-b border-white/10">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <a href="dashboard.html" class="flex items-center justify-center h-10 w-10 -ml-2 rounded-full text-gray-300 hover:bg-white/10 transition-colors">
+                    <span class="material-symbols-outlined text-2xl">arrow_back</span>
+                </a>
+                <h2 class="text-xl font-bold leading-tight tracking-tight text-white">Study Timer</h2>
+            </div>
+            <button class="flex items-center justify-center h-10 w-10 rounded-full bg-surface-dark hover:bg-primary/20 hover:text-primary transition-colors text-white">
+                <span class="material-symbols-outlined text-2xl">add</span>
+            </button>
+        </div>
+    </div>
+
+    <main class="flex-1 px-4 py-4 space-y-6 pb-24">
+        <!-- Timer Card -->
+        <div class="relative overflow-hidden rounded-2xl bg-surface-dark text-white shadow-lg p-6 border border-white/5">
+            <div class="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent pointer-events-none"></div>
+            <div class="relative z-10 flex flex-col gap-4">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-primary font-medium text-xs mb-1 uppercase tracking-wider">Focusing on</p>
+                        <h3 id="current-subject" class="text-xl font-semibold text-white">Select a Subject</h3>
+                    </div>
+                    <div class="h-8 w-8 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
+                        <span class="material-symbols-outlined text-primary text-lg">timer</span>
+                    </div>
+                </div>
+                
+                <!-- Digital Timer Display -->
+                <div class="flex flex-col items-center py-2">
+                    <span id="timer-display" class="text-5xl font-bold font-mono tracking-wider tabular-nums text-white">00:00:00</span>
+                </div>
+
+                <div class="flex gap-3">
+                    <button id="toggle-timer-btn" class="flex-1 h-12 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+                        <span class="material-symbols-outlined fill-1" id="play-icon">play_arrow</span>
+                        <span id="play-text">Start</span>
+                    </button>
+                    <button id="stop-timer-btn" class="h-12 w-12 rounded-xl bg-white/10 hover:bg-red-500/20 hover:text-red-500 text-white flex items-center justify-center transition-all border border-white/10 disabled:opacity-50" disabled>
+                        <span class="material-symbols-outlined">stop</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subjects List Header -->
+        <div class="flex justify-between items-end mb-4">
+            <h2 class="text-lg font-bold text-white">Your Subjects</h2>
+            <a class="text-xs font-medium text-primary hover:underline cursor-pointer">View All</a>
+        </div>
+        
+        <!-- Dynamic Subjects List -->
+        <div class="space-y-3" id="subject-list-container">
+            <div class="text-center text-gray-500 py-4">Loading subjects...</div>
+        </div>
+
+        <!-- Pomodoro Toggle -->
+        <div class="rounded-xl bg-surface-darker border border-white/10 p-4 text-white shadow-md">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-white/5 rounded-lg border border-white/5">
+                        <span class="material-symbols-outlined text-primary">timelapse</span>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm text-white">Pomodoro Mode</h4>
+                        <p class="text-xs text-gray-400">25m Focus • 5m Break</p>
+                    </div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input id="pomodoro-toggle" class="sr-only peer" type="checkbox" value=""/>
+                    <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                </label>
+            </div>
+        </div>
+    </main>
+
+    <!-- Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-surface-dark border-t border-white/10 px-6 pb-6 pt-3 z-50">
+        <div class="flex justify-between items-center max-w-lg mx-auto">
+            <a href="dashboard.html" class="flex flex-col items-center gap-1 text-gray-400 hover:text-primary transition-colors group">
+                <span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">home</span>
+                <span class="text-[10px] font-medium">Home</span>
+            </a>
+            <a href="#" class="flex flex-col items-center gap-1 text-gray-400 hover:text-primary transition-colors group">
+                <span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">calendar_month</span>
+                <span class="text-[10px] font-medium">Calendar</span>
+            </a>
+            <a href="#" class="flex flex-col items-center gap-1 text-gray-400 hover:text-primary transition-colors group">
+                <span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">groups</span>
+                <span class="text-[10px] font-medium">Groups</span>
+            </a>
+            <a href="#" class="flex flex-col items-center gap-1 text-gray-400 hover:text-primary transition-colors group">
+                <span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">smart_toy</span>
+                <span class="text-[10px] font-medium">AI</span>
+            </a>
+            <a href="#" class="flex flex-col items-center gap-1 text-gray-400 hover:text-primary transition-colors group">
+                <span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">person</span>
+                <span class="text-[10px] font-medium">Profile</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Firebase & Timer Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, updateDoc, increment, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDofDHfJvIKQmTtlg7x99mBtimuMmUUhBY",
+            authDomain: "facebook-379b3.firebaseapp.com",
+            databaseURL: "https://facebook-379b3-default-rtdb.firebaseio.com",
+            projectId: "facebook-379b3",
+            storageBucket: "facebook-379b3.firebasestorage.app",
+            messagingSenderId: "953265803311",
+            appId: "1:953265803311:web:13224cb211b82b1e36f6da"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Variables
+        let timerInterval = null;
+        let elapsedSeconds = 0;
+        let isRunning = false;
+        let currentUserUid = null;
+        let currentSubject = null;
+
+        // Elements
+        const timerDisplay = document.getElementById('timer-display');
+        const toggleBtn = document.getElementById('toggle-timer-btn');
+        const stopBtn = document.getElementById('stop-timer-btn');
+        const playIcon = document.getElementById('play-icon');
+        const playText = document.getElementById('play-text');
+        const subjectTitle = document.getElementById('current-subject');
+        const subjectListContainer = document.getElementById('subject-list-container');
+
+        // Check Auth and Load Subjects
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUserUid = user.uid;
+                await loadUserSubjects(user.uid);
+            } else {
+                window.location.href = "index.html";
+            }
+        });
+
+        // Load Subjects from Firestore
+        async function loadUserSubjects(uid) {
+            try {
+                const userDoc = await getDoc(doc(db, "users", uid));
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    const subjects = data.focusSubjects || ["General Study"]; // Fallback
+                    renderSubjects(subjects);
+                    
+                    // Auto select first subject
+                    if (subjects.length > 0) {
+                        selectSubject(subjects[0]);
+                    }
+                }
+            } catch (error) {
+                console.error("Error loading subjects:", error);
+                subjectListContainer.innerHTML = '<p class="text-center text-red-500">Failed to load subjects</p>';
+            }
+        }
+
+        // Render Subjects List
+        function renderSubjects(subjects) {
+            subjectListContainer.innerHTML = '';
+            subjects.forEach(subject => {
+                const div = document.createElement('div');
+                div.className = "group flex items-center justify-between p-4 rounded-xl bg-surface-dark border border-white/5 shadow-sm hover:border-primary/50 transition-colors cursor-pointer subject-item";
+                div.onclick = () => selectSubject(subject);
+                
+                div.innerHTML = `
+                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-primary hidden active-indicator"></div>
+                    <div class="flex items-center gap-4">
+                        <div class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                            <span class="material-symbols-outlined">menu_book</span>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-white subject-name">${subject}</h4>
+                            <p class="text-xs text-gray-400 font-medium status-text">Click to focus</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="event.stopPropagation(); selectSubject('${subject}'); startTimer();" class="h-8 w-8 rounded-full bg-white/5 text-gray-300 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all play-btn">
+                            <span class="material-symbols-outlined text-lg fill-1">play_arrow</span>
+                        </button>
+                    </div>
+                `;
+                subjectListContainer.appendChild(div);
+            });
+        }
+
+        // Format Time HH:MM:SS
+        function formatTime(totalSeconds) {
+            const hours = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+            const minutes = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+            const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
+        }
+
+        // Timer Logic
+        window.startTimer = function() {
+            if (isRunning) return;
+            isRunning = true;
+            toggleBtn.classList.replace('bg-primary', 'bg-yellow-500');
+            toggleBtn.classList.replace('hover:bg-primary-dark', 'hover:bg-yellow-600');
+            playIcon.textContent = 'pause';
+            playText.textContent = 'Pause';
+            stopBtn.disabled = false;
+
+            // Update UI for active subject
+            updateSubjectUI(currentSubject, true);
+
+            timerInterval = setInterval(() => {
+                elapsedSeconds++;
+                timerDisplay.textContent = formatTime(elapsedSeconds);
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            if (!isRunning) return;
+            isRunning = false;
+            clearInterval(timerInterval);
+            toggleBtn.classList.replace('bg-yellow-500', 'bg-primary');
+            toggleBtn.classList.replace('hover:bg-yellow-600', 'hover:bg-primary-dark');
+            playIcon.textContent = 'play_arrow';
+            playText.textContent = 'Resume';
+            
+            updateSubjectUI(currentSubject, false);
+        }
+
+        async function stopTimer() {
+            pauseTimer();
+            if (elapsedSeconds > 0 && currentUserUid) {
+                try {
+                    const minutesToAdd = Math.floor(elapsedSeconds / 60);
+                    if (minutesToAdd > 0) {
+                        const statsRef = doc(db, "users", currentUserUid, "stats", "summary");
+                        await setDoc(statsRef, {
+                            todayFocusedMinutes: increment(minutesToAdd)
+                        }, { merge: true });
+                        // Optional: Add logic to save per-subject time here if needed
+                    }
+                } catch (error) {
+                    console.error("Error saving time:", error);
+                }
+            }
+            
+            elapsedSeconds = 0;
+            timerDisplay.textContent = "00:00:00";
+            playText.textContent = "Start";
+            stopBtn.disabled = true;
+            updateSubjectUI(currentSubject, false);
+        }
+
+        // UI Interaction
+        toggleBtn.addEventListener('click', () => {
+            if (isRunning) pauseTimer();
+            else startTimer();
+        });
+
+        stopBtn.addEventListener('click', stopTimer);
+
+        // Subject Switching Logic
+        window.selectSubject = (subject) => {
+            if (isRunning && elapsedSeconds > 0) {
+                if(!confirm("Timer is running. Stop current session and switch?")) return;
+                stopTimer();
+            }
+            
+            currentSubject = subject;
+            subjectTitle.textContent = subject;
+            updateSubjectUI(subject, false);
+        };
+
+        function updateSubjectUI(activeSubject, isPlaying) {
+            const items = document.querySelectorAll('.subject-item');
+            items.forEach(item => {
+                const name = item.querySelector('.subject-name').textContent;
+                const status = item.querySelector('.status-text');
+                const indicator = item.querySelector('.active-indicator');
+                const playBtn = item.querySelector('.play-btn');
+                const playIconSpan = playBtn.querySelector('span');
+
+                if (name === activeSubject) {
+                    item.classList.add('border-primary/30');
+                    item.classList.remove('border-white/5');
+                    status.classList.add('text-primary');
+                    status.classList.remove('text-gray-400');
+                    indicator.classList.remove('hidden');
+                    
+                    if(isPlaying) {
+                        status.textContent = "Recording Time...";
+                        playIconSpan.textContent = "graphic_eq"; 
+                        playBtn.classList.add('text-primary', 'bg-primary/10');
+                    } else {
+                        status.textContent = "Ready to start";
+                        playIconSpan.textContent = "play_arrow";
+                        playBtn.classList.remove('text-primary', 'bg-primary/10');
+                    }
+                } else {
+                    item.classList.remove('border-primary/30');
+                    item.classList.add('border-white/5');
+                    status.textContent = "Click to focus";
+                    status.classList.remove('text-primary');
+                    status.classList.add('text-gray-400');
+                    indicator.classList.add('hidden');
+                    playIconSpan.textContent = "play_arrow";
+                    playBtn.classList.remove('text-primary', 'bg-primary/10');
+                }
+            });
+        }
+
+        timerDisplay.textContent = "00:00:00";
+    </script>
+</body>
+</html>
