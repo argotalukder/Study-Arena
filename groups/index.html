@@ -76,9 +76,9 @@
                         <button id="see-all-btn" class="text-sm font-medium text-primary hover:text-primary/80 transition-colors">See all</button>
                     </div>
                     
-                    <!-- Horizontal Scroll Container (Default) -->
-                    <!-- Added snap-x and w-full for better scrolling -->
-                    <div id="joined-list" class="flex gap-4 overflow-x-auto no-scrollbar pb-4 px-6 w-full snap-x snap-mandatory">
+                    <!-- Horizontal Scroll Container -->
+                    <!-- FIX: Added touch-pan-x for better mobile handling -->
+                    <div id="joined-list" class="flex gap-4 overflow-x-auto no-scrollbar pb-4 px-6 w-full snap-x snap-mandatory touch-pan-x">
                         <!-- JS Injected Cards Go Here -->
                     </div>
                 </div>
@@ -144,7 +144,7 @@
 
         let allGroups = [];
         let currentUserUid = null;
-        let isExpanded = false; // State for "See All"
+        let isExpanded = false; 
 
         // Cache for user avatars to reduce reads
         const avatarCache = {};
@@ -168,19 +168,30 @@
 
             if (isExpanded) {
                 // Expanded View (Vertical Grid)
-                list.classList.remove('flex', 'overflow-x-auto', 'gap-4', 'snap-x', 'snap-mandatory');
+                list.classList.remove('flex', 'overflow-x-auto', 'gap-4', 'snap-x', 'snap-mandatory', 'touch-pan-x');
                 list.classList.add('grid', 'grid-cols-1', 'gap-4');
-                unjoinedSection.classList.add('hidden'); // Hide other groups to focus
+                unjoinedSection.classList.add('hidden'); 
                 btn.textContent = "Show less";
             } else {
                 // Collapsed View (Horizontal Scroll)
                 list.classList.remove('grid', 'grid-cols-1', 'gap-4');
-                list.classList.add('flex', 'overflow-x-auto', 'gap-4', 'snap-x', 'snap-mandatory');
+                list.classList.add('flex', 'overflow-x-auto', 'gap-4', 'snap-x', 'snap-mandatory', 'touch-pan-x');
                 unjoinedSection.classList.remove('hidden');
                 btn.textContent = "See all";
             }
-            // Re-render to ensure card widths adjust
             renderGroups(allGroups);
+        });
+
+        // FIX: Enable Mouse Wheel Scrolling for Horizontal Section
+        const joinedListContainer = document.getElementById('joined-list');
+        joinedListContainer.addEventListener('wheel', (e) => {
+            // Only scroll horizontally if we are NOT in "See All" (expanded) mode
+            if (!isExpanded && e.deltaY !== 0) {
+                // Prevent vertical page scroll
+                e.preventDefault();
+                // Move horizontal scrollbar
+                joinedListContainer.scrollLeft += e.deltaY;
+            }
         });
 
         function loadAllGroups() {
@@ -208,7 +219,6 @@
             const unjoinedSection = document.getElementById('unjoined-section');
             const noResults = document.getElementById('no-results');
 
-            // Save current scroll position if needed, but for now simple clear
             joinedList.innerHTML = '';
             unjoinedList.innerHTML = '';
 
@@ -228,9 +238,7 @@
             if (joinedGroups.length > 0) {
                 joinedSection.classList.remove('hidden');
                 joinedGroups.forEach(group => {
-                    // Pass isExpanded to adjust card width
                     joinedList.insertAdjacentHTML('beforeend', getJoinedCardHTML(group, isExpanded));
-                    // Fetch real member avatars
                     fetchAndRenderMemberAvatars(group.id, group.members);
                 });
             } else {
@@ -239,11 +247,9 @@
 
             // Render Unjoined
             if (unjoinedGroups.length > 0) {
-                // Only show if not in expanded mode
                 if(!isExpanded) unjoinedSection.classList.remove('hidden');
                 unjoinedGroups.forEach(group => {
                     unjoinedList.insertAdjacentHTML('beforeend', getUnjoinedCardHTML(group));
-                    // Fetch real avatars (small)
                     fetchAndRenderMemberAvatars(group.id, group.members); 
                 });
             } else {
@@ -254,12 +260,9 @@
         // --- Card Generators ---
 
         function getJoinedCardHTML(group, isFullWidth) {
-            // Logic for Group Icon: Use uploaded icon or a generic placeholder (not random photo)
             const bgImage = group.groupIcon ? `url('${group.groupIcon}')` : 'none';
             const bgColor = group.groupIcon ? 'bg-cover bg-center' : 'bg-slate-700 flex items-center justify-center';
             const iconContent = group.groupIcon ? '' : '<span class="material-symbols-outlined text-2xl text-slate-400">groups</span>';
-
-            // Card width logic: w-64 for scroll, w-full for expanded
             const widthClass = isFullWidth ? 'w-full' : 'w-64';
 
             return `
@@ -276,9 +279,7 @@
                 <h3 class="font-bold text-white mb-1 truncate">${group.name}</h3>
                 <p class="text-xs text-slate-400 mb-3 truncate">${group.category || 'General'} • ${group.memberCount || 1} members</p>
                 
-                <!-- Members Container -->
                 <div class="flex -space-x-2 overflow-hidden mb-3 h-6 items-center" id="members-${group.id}">
-                    <!-- Placeholders while loading -->
                     <div class="w-6 h-6 rounded-full bg-slate-700 border border-card-dark animate-pulse"></div>
                     <div class="w-6 h-6 rounded-full bg-slate-700 border border-card-dark animate-pulse"></div>
                 </div>
@@ -313,8 +314,6 @@
                         }
                     </div>
                     <p class="text-sm text-slate-400 truncate mt-0.5">${group.category || 'Study Group'}</p>
-                    
-                    <!-- Small Members List -->
                     <div class="flex items-center gap-2 mt-2">
                         <div class="flex -space-x-1.5 h-5 items-center" id="members-small-${group.id}">
                             <div class="w-5 h-5 rounded-full bg-slate-700 border border-card-dark"></div>
@@ -328,11 +327,9 @@
             </div>`;
         }
 
-        // --- Fetch Real User Avatars ---
         async function fetchAndRenderMemberAvatars(groupId, memberIds) {
             if (!memberIds || memberIds.length === 0) return;
 
-            // Limit to 3 members to save reads/space
             const previewMembers = memberIds.slice(0, 3);
             const extraCount = memberIds.length > 3 ? memberIds.length - 3 : 0;
             
@@ -340,18 +337,15 @@
 
             for (const uid of previewMembers) {
                 let photoURL = '';
-                
-                // Check Cache
                 if (avatarCache[uid]) {
                     photoURL = avatarCache[uid];
                 } else {
                     try {
-                        // Fetch User Doc
                         const userDoc = await getDoc(doc(db, "users", uid));
                         if (userDoc.exists() && userDoc.data().photoURL) {
                             photoURL = userDoc.data().photoURL;
                         } else {
-                            photoURL = 'DEFAULT_ICON'; // Marker for default
+                            photoURL = 'DEFAULT_ICON'; 
                         }
                         avatarCache[uid] = photoURL;
                     } catch (e) {
@@ -361,10 +355,8 @@
                 }
 
                 if (photoURL === 'DEFAULT_ICON') {
-                     // Default Icon
                     avatarsHTML += `<div class="inline-block h-6 w-6 rounded-full ring-2 ring-card-dark bg-slate-600 flex items-center justify-center text-[10px] text-white font-bold">U</div>`;
                 } else {
-                    // Real User Image
                     avatarsHTML += `<img class="inline-block h-6 w-6 rounded-full ring-2 ring-card-dark object-cover" src="${photoURL}" alt="Member" />`;
                 }
             }
@@ -373,20 +365,15 @@
                 avatarsHTML += `<div class="flex items-center justify-center h-6 w-6 rounded-full ring-2 ring-card-dark bg-slate-700 text-[10px] font-bold text-slate-300">+${extraCount}</div>`;
             }
 
-            // Inject into Large Card
             const container = document.getElementById(`members-${groupId}`);
             if (container) container.innerHTML = avatarsHTML;
 
-            // Inject into Small Card (reuse HTML but adjust size classes slightly via regex if needed, or CSS handles it)
-            // Simplified: Just use the same HTML, tailwind classes will handle layout
             const smallContainer = document.getElementById(`members-small-${groupId}`);
             if (smallContainer) {
-                 // For small container, replace h-6 w-6 with h-5 w-5
                  smallContainer.innerHTML = avatarsHTML.replace(/h-6 w-6/g, 'h-5 w-5');
             }
         }
 
-        // Search Filter
         document.getElementById('search-input').addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase().trim();
             const filteredGroups = allGroups.filter(g => 
