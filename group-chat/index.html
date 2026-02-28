@@ -5,6 +5,8 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Group Chat</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Emoji Picker Library -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <script>
@@ -19,7 +21,7 @@
                         "surface-dark": "#1E1E1E",
                         "input-bar": "#2A2A2A",
                     },
-                    fontFamily: { "display": ["Lexend", "sans-serif"] },
+                    fontFamily: { "display":["Lexend", "sans-serif"] },
                 },
             },
         }
@@ -29,19 +31,87 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .font-variation-settings-fill { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        
+        /* Emoji Picker Styling */
+        emoji-picker {
+            width: 100%;
+            max-width: 320px;
+            height: 350px;
+            --background: #1E1E1E;
+            --border-color: #2A2A2A;
+            --input-font-color: #fff;
+            --input-placeholder-color: #999;
+            --indicator-color: #22C55E;
+            --button-hover-background: #333;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
     </style>
 </head>
-<body class="bg-black text-white flex justify-center min-h-screen">
-    <div class="w-full max-w-md bg-background-dark min-h-[100dvh] flex flex-col relative shadow-2xl border-x border-input-bar/30 overflow-hidden">
+<body class="bg-black text-white flex justify-center h-[100dvh] overflow-hidden">
+    
+    <!-- Image Preview Modal -->
+    <div id="image-modal" class="hidden fixed inset-0 z-[100] bg-black/95 flex items-center justify-center opacity-0 transition-opacity duration-300" onclick="closeImageModal()">
+        <button class="absolute top-6 right-6 text-white bg-black/50 hover:bg-gray-800 rounded-full p-2 backdrop-blur-sm transition-all z-50">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        <img id="modal-image" src="" class="max-w-[95vw] max-h-[95vh] object-contain transform scale-95 transition-transform duration-300 shadow-2xl" onclick="event.stopPropagation()">
+    </div>
+
+    <!-- Message Info Modal (Seen By & Delivered To) -->
+    <div id="msg-info-modal" class="hidden fixed inset-0 z-[110] bg-black/80 flex items-end sm:items-center justify-center opacity-0 transition-opacity duration-300" onclick="closeMsgInfoModal()">
+        <div class="bg-surface-dark w-full sm:w-[400px] h-[60vh] sm:h-[450px] rounded-t-2xl sm:rounded-2xl flex flex-col shadow-2xl transform translate-y-full sm:translate-y-0 transition-transform duration-300 border border-gray-700" onclick="event.stopPropagation()">
+            <div class="p-4 border-b border-gray-700 flex justify-between items-center bg-input-bar rounded-t-2xl sm:rounded-t-2xl">
+                <h2 class="text-white font-bold flex items-center gap-2"><span class="material-symbols-outlined text-[18px] text-primary">info</span> Message Info</h2>
+                <button onclick="closeMsgInfoModal()" class="text-gray-400 hover:text-white transition-colors bg-black/20 rounded-full p-1"><span class="material-symbols-outlined text-[20px]">close</span></button>
+            </div>
+            <div class="p-4 overflow-y-auto flex-1 text-sm no-scrollbar space-y-6">
+                <!-- Read By Section -->
+                <div>
+                    <h3 class="text-blue-400 font-semibold mb-3 flex items-center gap-2 text-[13px] uppercase tracking-wider"><span class="material-symbols-outlined text-[18px]">done_all</span> Read by</h3>
+                    <ul id="seen-by-list" class="space-y-2 text-gray-300"></ul>
+                </div>
+                <!-- Delivered To Section -->
+                <div>
+                    <h3 class="text-gray-400 font-semibold mb-3 flex items-center gap-2 text-[13px] uppercase tracking-wider"><span class="material-symbols-outlined text-[18px]">done</span> Delivered to</h3>
+                    <ul id="not-seen-by-list" class="space-y-2 text-gray-300"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Message Options Modal (Long Press / Click on Message) -->
+    <div id="msg-options-modal" class="hidden fixed inset-0 z-[120] bg-black/60 flex items-end sm:items-center justify-center opacity-0 transition-opacity duration-300" onclick="closeMsgOptions()">
+        <div class="bg-surface-dark w-full sm:w-[320px] rounded-t-2xl sm:rounded-2xl flex flex-col shadow-2xl transform translate-y-full sm:scale-95 transition-all duration-300 border border-gray-700 pb-6 sm:pb-0" onclick="event.stopPropagation()">
+            <div class="w-12 h-1.5 bg-gray-600 rounded-full mx-auto mt-3 mb-2 sm:hidden"></div>
+            <div class="p-4 border-b border-gray-700/50 flex justify-between items-center">
+                <h3 class="text-white font-semibold text-[15px]">Message Options</h3>
+                <button onclick="closeMsgOptions()" class="text-gray-400 hover:text-white bg-black/20 rounded-full p-1"><span class="material-symbols-outlined text-[18px]">close</span></button>
+            </div>
+            <div class="flex flex-col p-2 space-y-1">
+                <button id="btn-msg-info" class="flex items-center gap-3 p-3 hover:bg-input-bar rounded-xl transition-colors text-white text-sm font-medium w-full text-left">
+                    <span class="material-symbols-outlined text-blue-400">info</span> Message Info
+                </button>
+                <button id="btn-msg-edit" class="flex items-center gap-3 p-3 hover:bg-input-bar rounded-xl transition-colors text-white text-sm font-medium w-full text-left">
+                    <span class="material-symbols-outlined text-primary">edit</span> Edit Message
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="w-full max-w-md bg-background-dark h-[100dvh] flex flex-col relative shadow-2xl border-x border-input-bar/30 overflow-hidden">
         
         <!-- Header -->
         <header class="flex items-center justify-between px-4 py-3 bg-surface-dark border-b border-input-bar z-20 sticky top-0">
             <div class="flex items-center gap-3">
-                <button onclick="window.location.href='/groups'" class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-input-bar transition-colors text-gray-300">
+                <button onclick="window.location.href='/groups'" class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-input-bar transition-colors text-gray-300 flex-shrink-0">
                     <span class="material-symbols-outlined">arrow_back</span>
                 </button>
+                
+                <!-- Group Image -->
+                <img id="group-image" src="https://ui-avatars.com/api/?name=Group&background=22C55E&color=fff" class="w-10 h-10 rounded-full object-cover border border-gray-700 cursor-pointer flex-shrink-0" onclick="goToGroupInfo()" alt="Group DP">
+                
                 <div class="flex flex-col justify-center cursor-pointer" onclick="goToGroupInfo()">
-                    <h1 id="chat-title" class="text-[16px] font-bold text-white leading-tight truncate max-w-[180px]">Loading...</h1>
+                    <h1 id="chat-title" class="text-[16px] font-bold text-white leading-tight truncate max-w-[150px]">Loading...</h1>
                     <p id="chat-subtitle" class="text-[11px] text-gray-400 font-medium">Connecting...</p>
                 </div>
             </div>
@@ -73,9 +143,34 @@
         <!-- Bottom Section (Input + Nav) -->
         <div class="absolute bottom-0 left-0 w-full bg-background-dark z-30">
             
+            <!-- Emoji Picker Popup -->
+            <div id="emoji-popup" class="hidden absolute bottom-full mb-2 right-4 z-50 rounded-lg overflow-hidden border border-gray-700 bg-surface-dark shadow-2xl">
+                <emoji-picker class="dark"></emoji-picker>
+            </div>
+
             <!-- Input Area -->
-            <div class="px-3 pb-3 pt-2">
-                <!-- Image Preview (Hidden by default) -->
+            <div class="px-3 pb-3 pt-2 bg-background-dark">
+                
+                <!-- Typing Indicator -->
+                <div id="typing-indicator" class="hidden text-primary text-[11px] italic mb-1 px-2 font-medium tracking-wide">
+                    <span class="animate-pulse">Someone is typing...</span>
+                </div>
+
+                <!-- WhatsApp-style Edit Banner -->
+                <div id="edit-banner" class="hidden bg-[#2A2A2A] border-l-4 border-primary px-3 py-2 mx-1 mb-2 rounded-lg items-center justify-between shadow-md transition-all">
+                    <div class="flex items-center gap-2 overflow-hidden">
+                        <span class="material-symbols-outlined text-primary text-[18px]">edit</span>
+                        <div class="flex flex-col overflow-hidden">
+                            <span class="text-primary text-[11px] font-bold">Edit message</span>
+                            <span id="edit-old-text" class="text-gray-400 text-[11px] truncate w-48">...</span>
+                        </div>
+                    </div>
+                    <button id="cancel-edit" class="text-gray-400 hover:text-white p-1 transition-colors">
+                        <span class="material-symbols-outlined text-[18px]">close</span>
+                    </button>
+                </div>
+
+                <!-- Image Preview -->
                 <div id="image-preview-area" class="hidden px-2 pb-2">
                     <div class="relative inline-block">
                         <img id="image-preview" src="" class="h-16 w-16 rounded-lg object-cover border border-gray-600">
@@ -83,29 +178,32 @@
                     </div>
                 </div>
 
-                <div class="flex items-center gap-3">
+                <div class="flex items-end gap-2 w-full">
                     <!-- Plus Icon -->
-                    <button class="text-gray-400 hover:text-white transition-colors">
-                        <span class="material-symbols-outlined text-[26px]">add_circle</span>
+                    <button class="text-gray-400 hover:text-primary hover:bg-surface-dark p-2 rounded-full transition-all duration-200 mb-0.5 flex-shrink-0">
+                        <span class="material-symbols-outlined text-[24px]">add_circle</span>
                     </button>
                     
                     <!-- Camera Icon (Triggers Upload) -->
                     <input type="file" id="image-input" class="hidden" accept="image/*">
-                    <button id="image-btn" class="text-gray-400 hover:text-white transition-colors">
-                        <span class="material-symbols-outlined text-[26px]">photo_camera</span>
+                    <button id="image-btn" class="text-gray-400 hover:text-primary hover:bg-surface-dark p-2 rounded-full transition-all duration-200 mb-0.5 flex-shrink-0">
+                        <span class="material-symbols-outlined text-[22px]">photo_camera</span>
                     </button>
                     
-                    <!-- Text Input Field -->
-                    <div class="flex-1 bg-input-bar rounded-full px-4 py-3 flex items-center justify-between transition-all focus-within:ring-1 focus-within:ring-gray-600">
-                        <input id="message-input" type="text" class="bg-transparent border-none focus:ring-0 text-sm text-white w-full placeholder-gray-500 p-0 font-medium" placeholder="Type a message...">
-                        <button class="text-gray-400 hover:text-white ml-2">
-                            <span class="material-symbols-outlined text-[22px]">sentiment_satisfied</span>
+                    <!-- Text Input Field Container -->
+                    <div class="flex-1 bg-[#2A2A2A] border border-gray-700/60 rounded-[20px] px-4 py-2 flex items-center justify-between transition-all duration-300 focus-within:bg-[#333] focus-within:border-gray-500 focus-within:shadow-md relative min-w-0">
+                        <!-- Input Box -->
+                        <input id="message-input" type="text" class="flex-1 bg-transparent border-none focus:ring-0 text-sm text-white placeholder-gray-400 p-0 font-medium outline-none min-w-0" placeholder="Type a message..." autocomplete="off">
+                        
+                        <!-- Emoji Button -->
+                        <button id="emoji-btn" class="text-gray-400 hover:text-primary transition-colors ml-2 flex-shrink-0 p-1">
+                            <span class="material-symbols-outlined text-[24px]">sentiment_satisfied</span>
                         </button>
                     </div>
                     
                     <!-- Send Button -->
-                    <button id="send-btn" class="bg-primary hover:bg-primary-dark text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg shadow-primary/20 transition-all active:scale-90 flex-shrink-0">
-                        <span class="material-symbols-outlined text-[22px] ml-1">send</span>
+                    <button id="send-btn" class="bg-gradient-to-tr from-primary-dark to-primary hover:from-primary hover:to-[#4ade80] text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg shadow-primary/30 transition-all duration-300 hover:scale-105 active:scale-90 flex-shrink-0 mb-0.5 disabled:opacity-70 disabled:cursor-not-allowed">
+                        <span id="send-icon" class="material-symbols-outlined text-[20px] ml-0.5">send</span>
                     </button>
                 </div>
             </div>
@@ -141,7 +239,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, updateDoc, deleteField } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDofDHfJvIKQmTtlg7x99mBtimuMmUUhBY",
@@ -159,6 +257,11 @@
 
         let currentUser = null;
         let currentUserData = {};
+        window.messageData = {}; 
+        window.messageDocs = {}; 
+        window.editingMsgId = null; 
+        window.selectedMsgId = null; 
+        let groupMembers =[]; 
 
         // UI Refs
         const chatContainer = document.getElementById("chat-container");
@@ -169,8 +272,20 @@
         const imgPreviewArea = document.getElementById("image-preview-area");
         const imgPreview = document.getElementById("image-preview");
         const removeImg = document.getElementById("remove-image");
+        const editBanner = document.getElementById("edit-banner");
+        const editOldText = document.getElementById("edit-old-text");
+        const cancelEditBtn = document.getElementById("cancel-edit");
+        const sendIcon = document.getElementById("send-icon");
+        const typingIndicator = document.getElementById("typing-indicator");
+        
+        // Emoji Refs
+        const emojiBtn = document.getElementById("emoji-btn");
+        const emojiPopup = document.getElementById("emoji-popup");
+        const emojiPicker = document.querySelector('emoji-picker');
 
         let selectedImage = null;
+        let typingTimeout;
+        let isTyping = false;
 
         window.goToGroupInfo = () => window.location.href = `/group-info?id=${groupId}`;
 
@@ -188,12 +303,42 @@
 
         async function loadGroupInfo() {
             if(!groupId) return;
-            const groupDoc = await getDoc(doc(db, "groups", groupId));
-            if(groupDoc.exists()){
-                const data = groupDoc.data();
-                document.getElementById("chat-title").innerText = data.name;
-                document.getElementById("chat-subtitle").innerText = `${data.memberCount || 1} Members • 5 Online`;
-            }
+            onSnapshot(doc(db, "groups", groupId), (groupDoc) => {
+                if(groupDoc.exists()){
+                    const data = groupDoc.data();
+                    const groupName = data.name || "Group Chat";
+                    groupMembers = data.members ||[];
+                    
+                    document.getElementById("chat-title").innerText = groupName;
+                    
+                    const groupImgEl = document.getElementById("group-image");
+                    if (groupImgEl) {
+                        groupImgEl.src = data.photoURL || data.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(groupName)}&background=22C55E&color=fff`;
+                    }
+                    
+                    let onlineCount = 1; 
+                    if(data.onlineUsers && Array.isArray(data.onlineUsers)) {
+                        onlineCount = data.onlineUsers.length;
+                    } else if(data.onlineCount) {
+                        onlineCount = data.onlineCount;
+                    }
+                    
+                    document.getElementById("chat-subtitle").innerText = `${data.memberCount || groupMembers.length || 1} Members • ${onlineCount} Online`;
+
+                    // Handle Typing Indicator View
+                    const typingData = data.typing || {};
+                    const typists = Object.keys(typingData)
+                        .filter(uid => uid !== currentUser.uid)
+                        .map(uid => typingData[uid]);
+                    
+                    if(typists.length > 0) {
+                        typingIndicator.innerHTML = `<span class="animate-pulse material-symbols-outlined text-[12px] align-middle mr-1">edit</span><span class="animate-pulse">${typists.join(', ')} ${typists.length > 1 ? 'are' : 'is'} typing...</span>`;
+                        typingIndicator.classList.remove("hidden");
+                    } else {
+                        typingIndicator.classList.add("hidden");
+                    }
+                }
+            });
         }
 
         function loadMessages() {
@@ -203,12 +348,25 @@
             onSnapshot(q, (snapshot) => {
                 chatContainer.innerHTML = "";
                 let lastDate = null;
+                window.messageData = {};
+                window.messageDocs = {};
 
-                snapshot.forEach((doc) => {
-                    const msg = doc.data();
+                snapshot.forEach((docSnap) => {
+                    const msg = docSnap.data();
+                    const msgId = docSnap.id;
                     const isOwn = msg.senderId === currentUser.uid;
                     
-                    // Date Divider
+                    window.messageData[msgId] = msg.text || ''; 
+                    window.messageDocs[msgId] = msg;
+                    
+                    // Logic to mark message as SEEN
+                    const seenByMap = msg.seenBy || {};
+                    if (!isOwn && !seenByMap[currentUser.uid]) {
+                        updateDoc(docSnap.ref, {
+                            [`seenBy.${currentUser.uid}`]: currentUserData.fullName ? currentUserData.fullName.split(' ')[0] : "User"
+                        }).catch(e => console.log("Error updating seen status", e));
+                    }
+
                     const msgDate = msg.createdAt ? new Date(msg.createdAt.toMillis()).toDateString() : "Today";
                     if(msgDate !== lastDate) {
                         chatContainer.insertAdjacentHTML('beforeend', `
@@ -223,29 +381,35 @@
 
                     const time = msg.createdAt ? new Date(msg.createdAt.toMillis()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "";
 
-                    // Image Content
                     let contentHtml = "";
                     if(msg.image) {
-                        contentHtml += `<div class="mb-2 rounded-xl overflow-hidden"><img src="${msg.image}" class="w-full object-cover max-h-60 min-w-[150px]"></div>`;
+                        contentHtml += `<div class="mb-2 rounded-xl overflow-hidden cursor-pointer shadow-sm flex justify-center bg-black/10" onclick="openImageModal('${msg.image}')"><img src="${msg.image}" class="max-w-full h-auto max-h-[350px] object-contain hover:scale-105 transition-transform duration-500"></div>`;
                     }
                     if(msg.text) {
-                        contentHtml += `<p>${msg.text}</p>`;
+                        contentHtml += `<p class="whitespace-pre-wrap">${msg.text} ${msg.isEdited ? '<span class="text-[10px] opacity-70 ml-1 italic font-medium">(edited)</span>' : ''}</p>`;
                     }
 
+                    const isSeenByAnyone = Object.keys(seenByMap).length > 0;
+                    const tickColor = isSeenByAnyone ? 'text-blue-500' : 'text-gray-400';
+
+                    // Message HTML (Added Long-Press Logic for Own Messages)
                     const msgHTML = `
-                    <div class="flex items-end gap-3 group ${isOwn ? 'justify-end' : ''}">
+                    <div class="flex items-end gap-3 group ${isOwn ? 'justify-end' : ''}" id="msg-${msgId}">
                         ${!isOwn ? `<div class="w-8 h-8 rounded-full bg-cover bg-center border border-gray-700 flex-shrink-0" style="background-image: url('${msg.senderPhoto}')"></div>` : ''}
                         
                         <div class="flex flex-col gap-1 max-w-[75%] ${isOwn ? 'items-end' : 'items-start'}">
                             ${!isOwn ? `<span class="text-[11px] text-gray-400 ml-1 font-medium">${msg.senderName.split(' ')[0]}</span>` : ''}
                             
-                            <div class="px-4 py-3 ${isOwn ? 'bg-primary text-white rounded-[1.2rem] rounded-br-none' : 'bg-input-bar text-gray-200 rounded-[1.2rem] rounded-bl-none'} shadow-sm text-[14px] leading-relaxed break-words border border-transparent ${!isOwn ? 'border-gray-800' : ''}">
+                            <div class="relative px-4 py-2.5 ${isOwn ? 'bg-primary text-white rounded-[1.2rem] rounded-br-none cursor-pointer' : 'bg-input-bar text-gray-200 rounded-[1.2rem] rounded-bl-none'} shadow-sm text-[14px] leading-relaxed break-words border border-transparent ${!isOwn ? 'border-gray-800' : 'hover:opacity-90 transition-opacity'}"
+                                 ${isOwn ? `onmousedown="startPress(event, '${msgId}')" onmouseup="cancelPress()" onmouseleave="cancelPress()" ontouchstart="startPress(event, '${msgId}')" ontouchend="cancelPress()" ontouchmove="cancelPress()" oncontextmenu="handleContextMenu(event, '${msgId}')"` : ''}>
                                 ${contentHtml}
                             </div>
                             
                             ${isOwn 
-                                ? `<span class="text-[10px] text-gray-500 mr-1 flex items-center gap-1 font-medium">${time} <span class="material-symbols-outlined text-[14px] text-primary">done_all</span></span>` 
-                                : ''}
+                                ? `<div class="text-[10px] text-gray-500 mr-1 flex items-center gap-2 font-medium">
+                                    ${time} <span class="material-symbols-outlined text-[14px] ${tickColor}">done_all</span>
+                                   </div>` 
+                                : `<span class="text-[10px] text-gray-500 ml-1 mt-0.5 font-medium">${time}</span>`}
                         </div>
                     </div>`;
                     
@@ -255,7 +419,207 @@
             });
         }
 
-        // Image Selection Logic
+        // --- TYPING INDICATOR LOGIC (Fixed using setDoc merge) ---
+        msgInput.addEventListener('input', () => {
+            if(!currentUser || !groupId) return;
+            
+            if(!isTyping && msgInput.value.trim() !== "") {
+                isTyping = true;
+                setDoc(doc(db, "groups", groupId), {
+                    typing: {
+                        [currentUser.uid]: currentUserData.fullName ? currentUserData.fullName.split(' ')[0] : "User"
+                    }
+                }, { merge: true }).catch(e => console.error("Typing update error", e));
+            }
+
+            clearTimeout(typingTimeout);
+            
+            if(msgInput.value.trim() === "") {
+                stopTyping();
+            } else {
+                typingTimeout = setTimeout(stopTyping, 2000);
+            }
+        });
+
+        function stopTyping() {
+            if(!isTyping || !currentUser || !groupId) return;
+            isTyping = false;
+            updateDoc(doc(db, "groups", groupId), {
+                [`typing.${currentUser.uid}`]: deleteField()
+            }).catch(e => console.error("Stop typing error", e));
+        }
+
+        // --- EMOJI LOGIC ---
+        emojiBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            emojiPopup.classList.toggle('hidden');
+        });
+
+        emojiPicker.addEventListener('emoji-click', event => {
+            const cursorPosition = msgInput.selectionStart;
+            const text = msgInput.value;
+            const newText = text.slice(0, cursorPosition) + event.detail.unicode + text.slice(cursorPosition);
+            msgInput.value = newText;
+            msgInput.focus();
+            const newCursorPosition = cursorPosition + event.detail.unicode.length;
+            msgInput.setSelectionRange(newCursorPosition, newCursorPosition);
+            
+            msgInput.dispatchEvent(new Event('input'));
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!emojiPopup.contains(e.target) && !emojiBtn.contains(e.target)) {
+                emojiPopup.classList.add('hidden');
+            }
+        });
+
+        // --- LONG PRESS FOR EDIT & INFO OPTIONS ---
+        window.startPress = (e, msgId) => {
+            window.pressTimer = setTimeout(() => {
+                window.openMsgOptions(msgId);
+            }, 500); 
+        };
+
+        window.cancelPress = () => {
+            if(window.pressTimer) clearTimeout(window.pressTimer);
+        };
+
+        window.handleContextMenu = (e, msgId) => {
+            e.preventDefault(); 
+            window.openMsgOptions(msgId);
+        };
+
+        window.openMsgOptions = (msgId) => {
+            window.selectedMsgId = msgId;
+            const modal = document.getElementById("msg-options-modal");
+            modal.classList.remove("hidden");
+            setTimeout(() => {
+                modal.classList.add("opacity-100");
+                modal.children[0].classList.remove("translate-y-full", "sm:scale-95");
+            }, 10);
+            if('vibrate' in navigator) navigator.vibrate(50);
+        };
+
+        window.closeMsgOptions = () => {
+            const modal = document.getElementById("msg-options-modal");
+            modal.classList.remove("opacity-100");
+            modal.children[0].classList.add("translate-y-full", "sm:scale-95");
+            setTimeout(() => modal.classList.add("hidden"), 300);
+        };
+
+        document.getElementById("btn-msg-edit").addEventListener("click", () => {
+            window.closeMsgOptions();
+            if(window.selectedMsgId) window.editMessage(window.selectedMsgId);
+        });
+
+        document.getElementById("btn-msg-info").addEventListener("click", () => {
+            window.closeMsgOptions();
+            if(window.selectedMsgId) window.showMessageInfo(window.selectedMsgId);
+        });
+
+        // --- MODALS (IMAGE & SEEN INFO) ---
+        window.openImageModal = (src) => {
+            const modal = document.getElementById("image-modal");
+            const modalImg = document.getElementById("modal-image");
+            modalImg.src = src;
+            modal.classList.remove("hidden");
+            void modal.offsetWidth; 
+            modal.classList.add("opacity-100");
+            modalImg.classList.add("scale-100");
+        };
+
+        window.closeImageModal = () => {
+            const modal = document.getElementById("image-modal");
+            const modalImg = document.getElementById("modal-image");
+            modal.classList.remove("opacity-100");
+            modalImg.classList.remove("scale-100");
+            setTimeout(() => modal.classList.add("hidden"), 300);
+        };
+
+        window.showMessageInfo = async (msgId) => {
+            const msg = window.messageDocs[msgId];
+            if(!msg) return;
+
+            const modal = document.getElementById("msg-info-modal");
+            const seenList = document.getElementById("seen-by-list");
+            const notSeenList = document.getElementById("not-seen-by-list");
+
+            seenList.innerHTML = '<div class="flex justify-center py-2"><div class="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div></div>';
+            notSeenList.innerHTML = '';
+
+            modal.classList.remove("hidden");
+            setTimeout(() => {
+                modal.classList.add("opacity-100");
+                modal.children[0].classList.remove("translate-y-full");
+            }, 10);
+
+            const seenByMap = msg.seenBy || {};
+            const seenUids = Object.keys(seenByMap);
+            
+            seenList.innerHTML = '';
+            if(seenUids.length === 0) {
+                seenList.innerHTML = '<li class="text-gray-500 italic text-xs">No one has read this yet</li>';
+            } else {
+                seenUids.forEach(uid => {
+                    const name = seenByMap[uid];
+                    seenList.innerHTML += `<li class="flex items-center gap-3 bg-input-bar p-2 rounded-lg"><div class="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center text-[12px] font-bold text-primary">${name.charAt(0)}</div> <span class="font-medium">${name}</span></li>`;
+                });
+            }
+
+            notSeenList.innerHTML = '<div class="flex justify-center py-2"><div class="w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin"></div></div>';
+            
+            const notSeenUids = groupMembers.filter(uid => !seenUids.includes(uid) && uid !== msg.senderId);
+            
+            notSeenList.innerHTML = '';
+            if(notSeenUids.length === 0) {
+                notSeenList.innerHTML = '<li class="text-gray-500 italic text-xs">Delivered to everyone</li>';
+            } else {
+                for(let uid of notSeenUids) {
+                    try {
+                        const uDoc = await getDoc(doc(db, "users", uid));
+                        const name = uDoc.exists() ? (uDoc.data().fullName || "Unknown") : "Unknown";
+                        notSeenList.innerHTML += `<li class="flex items-center gap-3 bg-input-bar p-2 rounded-lg"><div class="w-7 h-7 rounded-full bg-gray-700 flex items-center justify-center text-[12px] font-bold text-gray-300">${name.charAt(0)}</div> <span class="font-medium">${name}</span></li>`;
+                    } catch(e) {
+                        notSeenList.innerHTML += `<li class="flex items-center gap-3 bg-input-bar p-2 rounded-lg text-gray-500"><span class="font-medium">Unknown User</span></li>`;
+                    }
+                }
+            }
+        };
+
+        window.closeMsgInfoModal = () => {
+            const modal = document.getElementById("msg-info-modal");
+            modal.classList.remove("opacity-100");
+            modal.children[0].classList.add("translate-y-full");
+            setTimeout(() => modal.classList.add("hidden"), 300);
+        };
+
+        // --- EDIT LOGIC ---
+        function cancelEditMode() {
+            window.editingMsgId = null;
+            editBanner.classList.add("hidden");
+            editBanner.classList.remove("flex");
+            sendIcon.textContent = "send";
+            msgInput.value = "";
+        }
+
+        cancelEditBtn.addEventListener("click", cancelEditMode);
+
+        window.editMessage = (msgId) => {
+            const oldText = window.messageData[msgId];
+            if (oldText === undefined || oldText === null) return;
+            
+            window.editingMsgId = msgId;
+            editOldText.textContent = oldText;
+            
+            editBanner.classList.remove("hidden");
+            editBanner.classList.add("flex");
+            sendIcon.textContent = "check";
+            sendIcon.classList.remove("ml-0.5"); 
+            
+            msgInput.value = oldText;
+            msgInput.focus();
+        };
+
         imgBtn.onclick = () => imgInput.click();
         imgInput.onchange = (e) => {
             const file = e.target.files[0];
@@ -275,41 +639,79 @@
             imgPreviewArea.classList.add("hidden");
         };
 
-        // Send Message
+        // --- SEND MESSAGE ---
         sendBtn.addEventListener("click", async () => {
             const text = msgInput.value.trim();
             if(!text && !selectedImage) return;
 
+            if (window.editingMsgId) {
+                const msgIdToEdit = window.editingMsgId;
+                const oldText = window.messageData[msgIdToEdit];
+                
+                if (text !== oldText && text !== "") {
+                    try {
+                        await updateDoc(doc(db, "groups", groupId, "messages", msgIdToEdit), {
+                            text: text,
+                            isEdited: true
+                        });
+                    } catch (error) {
+                        console.error("Edit Failed:", error);
+                        alert("Failed to edit the message.");
+                    }
+                }
+                cancelEditMode();
+                return;
+            }
+
+            const originalBtnContent = sendBtn.innerHTML;
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>';
+
+            const tempImg = selectedImage;
+            
             msgInput.value = "";
             imgPreviewArea.classList.add("hidden");
-            const tempImg = selectedImage;
             selectedImage = null;
+            imgInput.value = "";
 
             let imageUrl = null;
 
-            if(tempImg) {
-                const formData = new FormData();
-                formData.append('image', tempImg);
-                try {
+            try {
+                if(tempImg) {
+                    const formData = new FormData();
+                    formData.append('image', tempImg);
                     const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, { method: 'POST', body: formData });
                     const data = await res.json();
-                    if(data.success) imageUrl = data.data.url;
-                } catch(e) { console.error("Image Upload Failed", e); }
-            }
+                    if(data.success) {
+                        imageUrl = data.data.url;
+                    } else {
+                        throw new Error("Image upload failed");
+                    }
+                }
 
-            try {
                 await addDoc(collection(db, "groups", groupId, "messages"), {
                     text: text,
                     image: imageUrl,
                     senderId: currentUser.uid,
                     senderName: currentUserData.fullName,
                     senderPhoto: currentUserData.photoURL || `https://ui-avatars.com/api/?name=${currentUserData.fullName}&background=random`,
-                    createdAt: serverTimestamp()
+                    createdAt: serverTimestamp(),
+                    isEdited: false,
+                    seenBy: {} 
                 });
-            } catch(e) { console.error("Send Failed", e); }
+
+                stopTyping(); 
+
+            } catch(e) { 
+                console.error("Send Failed", e); 
+                alert("Failed to send message. Please try again.");
+                if (text) msgInput.value = text;
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = originalBtnContent;
+            }
         });
         
-        // Enter key to send
         msgInput.addEventListener("keypress", (e) => {
             if (e.key === "Enter") {
                 sendBtn.click();

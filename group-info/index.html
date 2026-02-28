@@ -18,7 +18,7 @@
                         "surface-dark": "#1E1E1E",
                         "input-bar": "#2A2A2A",
                     },
-                    fontFamily: { "display": ["Lexend", "sans-serif"] },
+                    fontFamily: { "display":["Lexend", "sans-serif"] },
                 },
             },
         }
@@ -27,8 +27,33 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="bg-black text-white flex justify-center min-h-screen">
-    <div class="w-full max-w-md bg-background-dark min-h-[100dvh] flex flex-col relative shadow-2xl border-x border-input-bar/30 overflow-hidden">
+<body class="bg-black text-white flex justify-center h-[100dvh] overflow-hidden">
+    
+    <!-- Hidden File Input for Group Icon Change -->
+    <input type="file" id="group-icon-input" class="hidden" accept="image/*">
+
+    <!-- All Media Modal -->
+    <div id="all-media-modal" class="hidden fixed inset-0 z-[100] bg-background-dark flex flex-col transition-opacity duration-300">
+        <div class="px-4 py-3 bg-surface-dark border-b border-input-bar flex items-center gap-3">
+            <button id="close-media-modal" class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-input-bar transition-colors text-gray-300">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </button>
+            <h2 class="text-base font-bold text-white">Shared Media</h2>
+        </div>
+        <div id="all-media-grid" class="flex-1 overflow-y-auto p-4 grid grid-cols-3 gap-2 content-start">
+            <!-- All images will be injected here -->
+        </div>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div id="preview-modal" class="hidden fixed inset-0 z-[110] bg-black/95 flex items-center justify-center opacity-0 transition-opacity duration-300" onclick="closePreviewModal()">
+        <button class="absolute top-6 right-6 text-white bg-black/50 hover:bg-gray-800 rounded-full p-2 backdrop-blur-sm transition-all z-50">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        <img id="preview-image" src="" class="max-w-[95vw] max-h-[95vh] object-contain transform scale-95 transition-transform duration-300 shadow-2xl" onclick="event.stopPropagation()">
+    </div>
+
+    <div class="w-full max-w-md bg-background-dark h-full flex flex-col relative shadow-2xl border-x border-input-bar/30 overflow-hidden">
         
         <!-- Header -->
         <header class="flex items-center justify-between px-4 py-3 bg-surface-dark border-b border-input-bar z-20 sticky top-0">
@@ -36,7 +61,7 @@
                 <span class="material-symbols-outlined">arrow_back</span>
             </button>
             <h1 class="text-base font-bold text-white leading-tight">Group Info</h1>
-            <button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-input-bar transition-colors text-gray-300">
+            <button id="more-options-btn" class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-input-bar transition-colors text-gray-300">
                 <span class="material-symbols-outlined">more_vert</span>
             </button>
         </header>
@@ -46,12 +71,17 @@
             
             <!-- Group Header Info -->
             <div class="flex flex-col items-center pt-8 pb-6 px-4">
-                <div class="relative">
-                    <div id="group-icon" class="w-24 h-24 rounded-full bg-input-bar bg-center bg-cover border-4 border-surface-dark shadow-lg mb-4 flex items-center justify-center text-primary">
+                <div class="relative group cursor-pointer" id="group-icon-container">
+                    <div id="group-icon" class="w-24 h-24 rounded-full bg-input-bar bg-center bg-cover border-4 border-surface-dark shadow-lg mb-4 flex items-center justify-center text-primary relative overflow-hidden">
                         <span class="material-symbols-outlined text-4xl">groups</span>
+                        <!-- Loading Overlay for Upload -->
+                        <div id="upload-loader" class="hidden absolute inset-0 bg-black/60 flex items-center justify-center">
+                            <div class="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        </div>
                     </div>
-                    <div class="absolute bottom-4 right-0 w-6 h-6 bg-primary rounded-full border-2 border-background-dark flex items-center justify-center">
-                        <span class="material-symbols-outlined text-white text-[14px]">check</span>
+                    <!-- Admin Edit Icon Overlay -->
+                    <div id="admin-icon-edit" class="hidden absolute bottom-4 right-0 w-8 h-8 bg-surface-dark rounded-full border border-gray-700 flex items-center justify-center hover:bg-input-bar transition-colors text-gray-300 z-10 shadow-md">
+                        <span class="material-symbols-outlined text-[16px]">photo_camera</span>
                     </div>
                 </div>
                 <h2 id="group-name" class="text-xl font-bold text-white mb-1 text-center">Loading...</h2>
@@ -89,17 +119,17 @@
 
             <div class="h-px bg-input-bar mx-5"></div>
 
-            <!-- Media Section (Dummy for now, can be real later) -->
+            <!-- Shared Media Section -->
             <div class="px-5 py-5">
                 <div class="flex items-center justify-between mb-3">
                     <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wide">Shared Media</h3>
-                    <button class="text-xs text-primary font-medium hover:underline">See All</button>
+                    <button id="see-all-media-btn" class="text-xs text-primary font-medium hover:underline">See All</button>
                 </div>
-                <div class="grid grid-cols-4 gap-2">
-                    <div class="aspect-square bg-input-bar rounded-lg flex items-center justify-center text-gray-600"><span class="material-symbols-outlined">image</span></div>
-                    <div class="aspect-square bg-input-bar rounded-lg flex items-center justify-center text-gray-600"><span class="material-symbols-outlined">image</span></div>
-                    <div class="aspect-square bg-input-bar rounded-lg flex items-center justify-center text-gray-600"><span class="material-symbols-outlined">description</span></div>
-                    <div class="aspect-square bg-input-bar rounded-lg flex items-center justify-center text-gray-500 font-bold text-xs">+0</div>
+                <div id="shared-media-container" class="grid grid-cols-4 gap-2">
+                    <div class="aspect-square bg-input-bar rounded-lg flex items-center justify-center text-gray-600 animate-pulse"></div>
+                    <div class="aspect-square bg-input-bar rounded-lg flex items-center justify-center text-gray-600 animate-pulse"></div>
+                    <div class="aspect-square bg-input-bar rounded-lg flex items-center justify-center text-gray-600 animate-pulse"></div>
+                    <div class="aspect-square bg-input-bar rounded-lg flex items-center justify-center text-gray-600 animate-pulse"></div>
                 </div>
             </div>
 
@@ -107,13 +137,18 @@
 
             <!-- Members List -->
             <div class="px-0 py-2">
-                <div class="px-5 py-3 flex items-center justify-between">
-                    <h3 id="member-header" class="text-sm font-semibold text-gray-300 uppercase tracking-wide">Members</h3>
-                    <span class="material-symbols-outlined text-gray-500 cursor-pointer">search</span>
+                <div class="px-5 py-3 flex flex-col gap-2">
+                    <div class="flex items-center justify-between">
+                        <h3 id="member-header" class="text-sm font-semibold text-gray-300 uppercase tracking-wide">Members</h3>
+                        <button id="toggle-search-btn" class="w-8 h-8 rounded-full hover:bg-input-bar flex items-center justify-center text-gray-500 hover:text-white transition-colors">
+                            <span class="material-symbols-outlined text-[20px]">search</span>
+                        </button>
+                    </div>
+                    <!-- Hidden Search Input -->
+                    <input type="text" id="member-search-input" placeholder="Search members..." class="hidden w-full bg-input-bar text-white text-sm px-4 py-2.5 rounded-xl border border-gray-800 focus:outline-none focus:border-primary transition-colors mb-2">
                 </div>
                 
                 <div id="members-list" class="flex flex-col">
-                    <!-- Members will be injected here -->
                     <div class="flex justify-center py-4"><div class="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div></div>
                 </div>
             </div>
@@ -122,7 +157,7 @@
 
             <!-- Exit Actions -->
             <div class="px-0 py-2 pb-8">
-                <button class="w-full flex items-center px-5 py-3.5 hover:bg-input-bar transition-colors gap-3 group">
+                <button id="group-settings-btn" class="w-full flex items-center px-5 py-3.5 hover:bg-input-bar transition-colors gap-3 group">
                     <span class="material-symbols-outlined text-gray-400 group-hover:text-primary transition-colors">settings</span>
                     <span class="text-sm text-white font-medium flex-1 text-left">Group Settings</span>
                     <span class="material-symbols-outlined text-gray-600 text-sm">arrow_forward_ios</span>
@@ -135,32 +170,87 @@
         </main>
 
         <!-- Floating Invite Button -->
-        <div class="absolute bottom-[72px] left-0 w-full px-4 pb-4 bg-gradient-to-t from-background-dark to-transparent pointer-events-none flex justify-center">
+        <div class="absolute bottom-[72px] left-0 w-full px-4 pb-4 bg-gradient-to-t from-background-dark to-transparent pointer-events-none flex justify-center z-30">
             <button class="pointer-events-auto bg-primary hover:bg-primary-dark text-white font-medium rounded-xl py-3 px-6 w-full shadow-lg shadow-primary/20 transition-all active:scale-95 flex items-center justify-center gap-2">
                 <span class="material-symbols-outlined">person_add</span>
                 Invite Members
             </button>
         </div>
 
+        <!-- 3-Dot / Settings Bottom Sheet -->
+        <div id="more-menu-backdrop" class="absolute inset-0 bg-black/60 z-50 hidden items-end justify-center backdrop-blur-sm transition-opacity">
+            <div id="more-menu-sheet" class="w-full bg-surface-dark rounded-t-3xl overflow-hidden shadow-2xl border-t border-input-bar translate-y-full transition-transform duration-300 flex flex-col max-h-[90vh]">
+                <div class="w-full flex justify-center pt-3 pb-2 cursor-pointer" id="close-more-menu">
+                    <div class="w-12 h-1.5 bg-gray-600 rounded-full opacity-50 hover:bg-gray-500 transition-colors"></div>
+                </div>
+                <div class="px-4 pb-8 pt-2 flex flex-col gap-1 overflow-y-auto">
+                    
+                    <!-- Admin Options -->
+                    <button id="admin-edit-btn" class="hidden items-center w-full p-4 hover:bg-input-bar rounded-xl transition-colors group text-left">
+                        <div class="w-10 h-10 rounded-full bg-input-bar flex items-center justify-center text-primary mr-4 group-hover:bg-[#333] transition-colors"><span class="material-symbols-outlined text-[22px]">edit</span></div>
+                        <div class="flex-1"><h3 class="text-white font-medium text-sm">Edit Group Info</h3><p class="text-gray-500 text-xs">Name, description & avatar</p></div>
+                    </button>
+                    
+                    <button class="flex items-center w-full p-4 hover:bg-input-bar rounded-xl transition-colors group text-left">
+                        <div class="w-10 h-10 rounded-full bg-input-bar flex items-center justify-center text-primary mr-4 group-hover:bg-[#333] transition-colors"><span class="material-symbols-outlined text-[22px]">notifications</span></div>
+                        <div class="flex-1"><h3 class="text-white font-medium text-sm">Notification Settings</h3><p class="text-gray-500 text-xs">Mute or customize tones</p></div>
+                    </button>
+                    
+                    <button id="admin-privacy-btn" class="hidden items-center w-full p-4 hover:bg-input-bar rounded-xl transition-colors group text-left">
+                        <div class="w-10 h-10 rounded-full bg-input-bar flex items-center justify-center text-primary mr-4 group-hover:bg-[#333] transition-colors"><span class="material-symbols-outlined text-[22px]">lock</span></div>
+                        <div class="flex-1"><h3 class="text-white font-medium text-sm">Group Privacy</h3><p class="text-gray-500 text-xs">Who can join or post</p></div>
+                    </button>
+                    
+                    <div class="h-px bg-input-bar my-1 mx-4"></div>
+                    
+                    <button id="admin-clear-chat-btn" class="hidden items-center w-full p-4 hover:bg-input-bar rounded-xl transition-colors group text-left">
+                        <div class="w-10 h-10 rounded-full bg-input-bar flex items-center justify-center text-primary mr-4 group-hover:bg-[#333] transition-colors"><span class="material-symbols-outlined text-[22px]">delete</span></div>
+                        <div class="flex-1"><h3 class="text-white font-medium text-sm">Clear Chat History</h3><p class="text-gray-500 text-xs">Delete messages for me</p></div>
+                    </button>
+                    
+                    <button class="flex items-center w-full p-4 hover:bg-input-bar rounded-xl transition-colors group text-left">
+                        <div class="w-10 h-10 rounded-full bg-input-bar flex items-center justify-center text-primary mr-4 group-hover:bg-[#333] transition-colors"><span class="material-symbols-outlined text-[22px]">flag</span></div>
+                        <div class="flex-1"><h3 class="text-white font-medium text-sm">Report Group</h3><p class="text-gray-500 text-xs">Violates community rules</p></div>
+                    </button>
+                    
+                    <button id="leave-group-menu-btn" class="flex items-center w-full p-4 hover:bg-red-500/10 rounded-xl transition-colors group text-left mt-2">
+                        <div class="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 mr-4 group-hover:bg-red-500/20 transition-colors"><span class="material-symbols-outlined text-[22px]">logout</span></div>
+                        <div class="flex-1"><h3 class="text-red-500 font-medium text-sm">Leave Group</h3><p class="text-red-400/60 text-xs">Exit this study group</p></div>
+                    </button>
+
+                    <!-- Admin Delete Group Button -->
+                    <button id="admin-delete-group-btn" class="hidden items-center w-full p-4 hover:bg-red-500/10 rounded-xl transition-colors group text-left mt-1">
+                        <div class="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 mr-4 group-hover:bg-red-500/20 transition-colors">
+                            <span class="material-symbols-outlined text-[22px]">delete_forever</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-red-500 font-medium text-sm">Delete Group</h3>
+                            <p class="text-red-400/60 text-xs">Permanently delete this group</p>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Bottom Navigation -->
-        <nav class="absolute bottom-0 left-0 right-0 bg-surface-dark border-t border-input-bar pb-6 pt-2 px-6 flex justify-between items-end z-40 h-[68px]">
-            <a class="flex flex-col items-center justify-end gap-1 text-gray-400 group hover:text-gray-200 transition-colors h-full pb-2" href="/dashboard">
+        <nav class="absolute bottom-0 left-0 right-0 bg-surface-dark border-t border-input-bar flex justify-around px-2 pt-2 pb-4 z-40">
+            <a class="flex flex-1 flex-col items-center justify-center gap-1 text-gray-400 group hover:text-gray-200 transition-colors" href="/dashboard">
                 <span class="material-symbols-outlined text-[24px] group-active:scale-90 transition-transform">home</span>
                 <p class="text-[10px] font-medium leading-none">Home</p>
             </a>
-            <a class="flex flex-col items-center justify-end gap-1 text-gray-400 group hover:text-gray-200 transition-colors h-full pb-2" href="#">
+            <a class="flex flex-1 flex-col items-center justify-center gap-1 text-gray-400 group hover:text-gray-200 transition-colors" href="#">
                 <span class="material-symbols-outlined text-[24px] group-active:scale-90 transition-transform">calendar_month</span>
                 <p class="text-[10px] font-medium leading-none">Calendar</p>
             </a>
-            <a class="flex flex-col items-center justify-end gap-1 text-primary group h-full pb-2 relative" href="/groups">
+            <a class="flex flex-1 flex-col items-center justify-center gap-1 text-primary group relative" href="/groups">
                 <span class="material-symbols-outlined text-[24px] font-variation-settings-fill group-active:scale-90 transition-transform">groups</span>
                 <p class="text-[10px] font-medium leading-none">Groups</p>
             </a>
-            <a class="flex flex-col items-center justify-end gap-1 text-gray-400 group hover:text-gray-200 transition-colors h-full pb-2" href="#">
+            <a class="flex flex-1 flex-col items-center justify-center gap-1 text-gray-400 group hover:text-gray-200 transition-colors" href="#">
                 <span class="material-symbols-outlined text-[24px] group-active:scale-90 transition-transform">smart_toy</span>
                 <p class="text-[10px] font-medium leading-none">AI</p>
             </a>
-            <a class="flex flex-col items-center justify-end gap-1 text-gray-400 group hover:text-gray-200 transition-colors h-full pb-2" href="/profile">
+            <a class="flex flex-1 flex-col items-center justify-center gap-1 text-gray-400 group hover:text-gray-200 transition-colors" href="/profile">
                 <span class="material-symbols-outlined text-[24px] group-active:scale-90 transition-transform">person</span>
                 <p class="text-[10px] font-medium leading-none">Profile</p>
             </a>
@@ -171,7 +261,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc, arrayRemove, increment } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, updateDoc, arrayRemove, increment, collection, query, orderBy, limit, getDocs, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDofDHfJvIKQmTtlg7x99mBtimuMmUUhBY",
@@ -182,102 +272,312 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const imgbbApiKey = "957a2f2e8fc22269da1f2045b3f25eab";
 
         const urlParams = new URLSearchParams(window.location.search);
         const groupId = urlParams.get('id');
         let currentUser = null;
+        let allMediaUrls = [];
 
         onAuthStateChanged(auth, (user) => {
             if (user) { 
                 currentUser = user;
-                loadGroupData();
+                initGroupListener();
             } else { 
                 window.location.href = "/auth"; 
             }
         });
 
-        async function loadGroupData() {
+        // Initialize Real-time Listener for Group Data & Deletion
+        function initGroupListener() {
             if(!groupId) return;
-            const groupRef = doc(db, "groups", groupId);
-            const groupSnap = await getDoc(groupRef);
+            
+            // Listen for group changes (Real-time redirect & updates)
+            onSnapshot(doc(db, "groups", groupId), async (groupSnap) => {
+                if (!groupSnap.exists()) {
+                    // Redirect everyone if group is deleted
+                    window.location.href = "/groups";
+                    return;
+                }
 
-            if(groupSnap.exists()) {
                 const data = groupSnap.data();
+                const isAdmin = currentUser.uid === data.createdBy;
                 
-                // Set Basic Info
+                // --- Update UI ---
                 document.getElementById("group-name").innerText = data.name;
                 document.getElementById("group-desc").innerText = data.description || "No description.";
                 document.getElementById("group-meta").innerText = `${data.memberCount || 1} Members • Created by ${data.creatorName || 'Admin'}`;
                 document.getElementById("member-header").innerText = `${data.memberCount || 1} Members`;
 
-                // Set Avatar
-                if(data.groupIcon) {
+                if(data.groupIcon || data.image) {
                     const iconEl = document.getElementById("group-icon");
-                    iconEl.style.backgroundImage = `url('${data.groupIcon}')`;
-                    iconEl.innerHTML = ''; // remove default icon
+                    iconEl.style.backgroundImage = `url('${data.groupIcon || data.image}')`;
+                    iconEl.innerHTML = `<div id="upload-loader" class="hidden absolute inset-0 bg-black/60 flex items-center justify-center"><div class="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div></div>`;
                 }
 
-                // Fetch & Render Members (Only creator + current user for demo, real implementation needs subcollection or array fetch)
-                // Since members array holds UIDs, we would ideally fetch user profiles. 
-                // For now, let's just show the creator and a placeholder for current user.
+                // --- Admin Controls ---
+                const adminEditBtn = document.getElementById("admin-edit-btn");
+                const adminPrivacyBtn = document.getElementById("admin-privacy-btn");
+                const adminClearChatBtn = document.getElementById("admin-clear-chat-btn");
+                const adminDeleteGroupBtn = document.getElementById("admin-delete-group-btn");
+                const adminIconEdit = document.getElementById("admin-icon-edit");
+                const groupIconInput = document.getElementById("group-icon-input");
                 
-                const membersList = document.getElementById("members-list");
-                membersList.innerHTML = ''; // Clear loader
+                if (isAdmin) {
+                    adminEditBtn.classList.remove("hidden"); adminEditBtn.classList.add("flex");
+                    adminPrivacyBtn.classList.remove("hidden"); adminPrivacyBtn.classList.add("flex");
+                    adminClearChatBtn.classList.remove("hidden"); adminClearChatBtn.classList.add("flex");
+                    adminDeleteGroupBtn.classList.remove("hidden"); adminDeleteGroupBtn.classList.add("flex");
+                    adminIconEdit.classList.remove("hidden");
+                    
+                    document.getElementById("group-icon-container").onclick = () => groupIconInput.click();
 
-                // Render Creator (Admin)
-                const creatorHTML = `
-                    <div class="flex items-center px-5 py-3 hover:bg-input-bar transition-colors cursor-pointer gap-3">
-                        <div class="relative">
-                            <div class="w-10 h-10 rounded-full bg-surface-dark bg-cover bg-center border border-gray-700" style="background-image: url('https://ui-avatars.com/api/?name=${data.creatorName}&background=random')"></div>
-                            <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-primary rounded-full border border-background-dark"></div>
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex justify-between items-center">
-                                <h4 class="text-sm font-medium text-white">${data.creatorName}</h4>
-                                <span class="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">Admin</span>
-                            </div>
-                            <p class="text-xs text-gray-400">Group Creator</p>
-                        </div>
+                    groupIconInput.onchange = async (e) => {
+                        const file = e.target.files[0];
+                        if(!file) return;
+                        const loader = document.getElementById("upload-loader");
+                        loader.classList.remove("hidden");
+                        try {
+                            const formData = new FormData();
+                            formData.append('image', file);
+                            const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, { method: 'POST', body: formData });
+                            const json = await res.json();
+                            if(json.success) {
+                                await updateDoc(doc(db, "groups", groupId), { groupIcon: json.data.url, image: json.data.url });
+                            }
+                        } catch (err) { console.error(err); } 
+                        finally { loader.classList.add("hidden"); }
+                    };
+                }
+
+                // --- FAST MEMBER LOADING (Parallel Fetching) ---
+                renderMembersOptimized(data, isAdmin);
+                
+            });
+            
+            // Load media once (not strictly reactive to avoid heavy reads on every small update)
+            loadSharedMedia();
+        }
+
+        async function renderMembersOptimized(data, isAdmin) {
+            const membersList = document.getElementById("members-list");
+            
+            // Collect all UIDs to fetch
+            const memberUids = data.members || [];
+            // Add creator if not in list
+            if (!memberUids.includes(data.createdBy)) memberUids.unshift(data.createdBy);
+
+            // Fetch all users in parallel
+            const promises = memberUids.map(uid => getDoc(doc(db, "users", uid)));
+            const userSnaps = await Promise.all(promises);
+            
+            // Create a map for easy lookup
+            const usersMap = {};
+            userSnaps.forEach(snap => {
+                if (snap.exists()) usersMap[snap.id] = snap.data();
+            });
+
+            // Generate HTML String
+            let html = '';
+
+            // 1. Render Creator
+            const creatorData = usersMap[data.createdBy] || {};
+            let adminName = creatorData.name || creatorData.displayName || creatorData.fullName || data.creatorName || "Admin";
+            let adminPhoto = creatorData.profileImage || creatorData.photoURL || `https://ui-avatars.com/api/?name=${adminName}&background=random`;
+            
+            html += `
+                <div class="member-item flex items-center px-5 py-3 hover:bg-input-bar transition-colors cursor-pointer gap-3" data-name="${adminName}">
+                    <div class="relative">
+                        <div class="w-10 h-10 rounded-full bg-surface-dark bg-cover bg-center border border-gray-700" style="background-image: url('${adminPhoto}')"></div>
+                        <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-primary rounded-full border border-background-dark"></div>
                     </div>
-                `;
-                membersList.insertAdjacentHTML('beforeend', creatorHTML);
+                    <div class="flex-1">
+                        <div class="flex justify-between items-center">
+                            <h4 class="text-sm font-medium text-white">${adminName} ${isAdmin ? '(You)' : ''}</h4>
+                            <span class="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">Admin</span>
+                        </div>
+                        <p class="text-xs text-gray-400">Group Creator</p>
+                    </div>
+                </div>
+            `;
 
-                // Render Current User (You)
-                if(currentUser.uid !== data.createdBy) {
-                    const youHTML = `
-                        <div class="flex items-center px-5 py-3 hover:bg-input-bar transition-colors cursor-pointer gap-3">
+            // 2. Render Other Members
+            if (data.members && Array.isArray(data.members)) {
+                data.members.forEach(uid => {
+                    if (uid === data.createdBy) return; // Skip creator
+
+                    const isMe = uid === currentUser.uid;
+                    const userData = usersMap[uid] || {};
+                    let realName = userData.name || userData.displayName || userData.fullName || "User";
+                    let displayName = isMe ? `${realName} (You)` : realName;
+                    let photoUrl = userData.profileImage || userData.photoURL || `https://ui-avatars.com/api/?name=${realName}&background=random`;
+
+                    // Delete Button Logic (Only string construction, no logic here)
+                    let removeBtn = '';
+                    if (isAdmin && !isMe) {
+                        removeBtn = `
+                            <button onclick="removeMember('${uid}')" class="w-8 h-8 rounded-full hover:bg-red-500/10 flex items-center justify-center text-gray-500 hover:text-red-500 transition-colors" title="Remove Member">
+                                <span class="material-symbols-outlined text-[20px]">person_remove</span>
+                            </button>
+                        `;
+                    }
+
+                    html += `
+                        <div class="member-item flex items-center px-5 py-3 hover:bg-input-bar transition-colors gap-3 group" data-name="${realName}">
                             <div class="relative">
-                                <div class="w-10 h-10 rounded-full bg-surface-dark bg-cover bg-center border border-gray-700" style="background-image: url('${currentUser.photoURL || `https://ui-avatars.com/api/?name=User&background=random`}')"></div>
-                                <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-primary rounded-full border border-background-dark"></div>
+                                <div class="w-10 h-10 rounded-full bg-surface-dark bg-cover bg-center border border-gray-700" style="background-image: url('${photoUrl}')"></div>
+                                <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-gray-500 rounded-full border border-background-dark"></div>
                             </div>
                             <div class="flex-1">
                                 <div class="flex justify-between items-center">
-                                    <h4 class="text-sm font-medium text-white">You</h4>
+                                    <h4 class="text-sm font-medium text-white">${displayName}</h4>
                                 </div>
-                                <p class="text-xs text-gray-400">Online</p>
+                                <p class="text-xs text-gray-400">${isMe ? 'Online' : 'Offline'}</p>
                             </div>
+                            ${removeBtn}
                         </div>
                     `;
-                    membersList.insertAdjacentHTML('beforeend', youHTML);
-                }
+                });
+            } else if (!isAdmin) {
+                // Fallback for user if no members array
+                const meData = usersMap[currentUser.uid] || {};
+                let myName = meData.name || "You";
+                let myPhoto = meData.profileImage || currentUser.photoURL;
+                html += `
+                    <div class="member-item flex items-center px-5 py-3 hover:bg-input-bar transition-colors cursor-pointer gap-3" data-name="${myName}">
+                        <div class="relative">
+                            <div class="w-10 h-10 rounded-full bg-surface-dark bg-cover bg-center border border-gray-700" style="background-image: url('${myPhoto}')"></div>
+                            <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-primary rounded-full border border-background-dark"></div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-center"><h4 class="text-sm font-medium text-white">${myName} (You)</h4></div>
+                            <p class="text-xs text-gray-400">Online</p>
+                        </div>
+                    </div>
+                `;
             }
+
+            membersList.innerHTML = html;
         }
 
-        // Leave Group Functionality
-        document.getElementById("leave-btn").addEventListener("click", async () => {
-            if(confirm("Are you sure you want to leave this group?")) {
+        // Global Remove Member Function
+        window.removeMember = async (memberUid) => {
+            if(confirm("Are you sure you want to remove this member?")) {
                 try {
                     await updateDoc(doc(db, "groups", groupId), {
-                        members: arrayRemove(currentUser.uid),
+                        members: arrayRemove(memberUid),
                         memberCount: increment(-1)
                     });
-                    window.location.href = "/groups";
-                } catch(e) {
-                    console.error("Error leaving group:", e);
-                    alert("Failed to leave group.");
+                } catch(e) { console.error(e); alert("Failed to remove."); }
+            }
+        };
+
+        // Fetch Shared Media
+        async function loadSharedMedia() {
+            const mediaContainer = document.getElementById("shared-media-container");
+            if (!groupId) return;
+            try {
+                const q = query(collection(db, "groups", groupId, "messages"), orderBy("createdAt", "desc"), limit(100));
+                const snap = await getDocs(q);
+                let mediaHTML = '';
+                let mediaCount = 0;
+                allMediaUrls = [];
+
+                snap.forEach(doc => {
+                    const msg = doc.data();
+                    const img = msg.image || msg.imageUrl || msg.photoUrl || msg.fileUrl; 
+                    if (img) {
+                        allMediaUrls.push(img); 
+                        if (mediaCount < 3) {
+                            mediaHTML += `<div class="aspect-square bg-input-bar rounded-lg bg-cover bg-center cursor-pointer hover:opacity-80 transition-opacity border border-gray-800" style="background-image: url('${img}')" onclick="openPreviewModal('${img}')"></div>`;
+                            mediaCount++;
+                        } else { mediaCount++; }
+                    }
+                });
+
+                if (mediaCount > 0) {
+                    let remaining = mediaCount > 3 ? `+${mediaCount - 3}` : `<span class="material-symbols-outlined">arrow_forward</span>`;
+                    if(mediaCount > 3 || mediaCount === 4) {
+                         mediaHTML += `<div class="aspect-square bg-input-bar rounded-lg flex items-center justify-center text-gray-400 font-bold text-xs cursor-pointer hover:bg-input-bar/80 transition-colors border border-gray-800" onclick="document.getElementById('see-all-media-btn').click()">${remaining}</div>`;
+                    }
+                    mediaContainer.innerHTML = mediaHTML;
+                } else {
+                    mediaContainer.innerHTML = `<div class="col-span-4 text-center text-xs text-gray-500 py-4">No media shared</div>`;
                 }
+            } catch (e) { console.error(e); }
+        }
+
+        // Search, Leave, Delete, & UI Logic
+        const searchInput = document.getElementById("member-search-input");
+        document.getElementById("toggle-search-btn").addEventListener("click", () => {
+            searchInput.classList.toggle("hidden");
+            if (!searchInput.classList.contains("hidden")) {
+                searchInput.focus();
+            } else {
+                searchInput.value = '';
+                document.querySelectorAll(".member-item").forEach(item => item.style.display = "flex");
             }
         });
+
+        searchInput.addEventListener("input", (e) => {
+            const term = e.target.value.toLowerCase();
+            document.querySelectorAll(".member-item").forEach(item => {
+                const name = item.getAttribute("data-name").toLowerCase();
+                item.style.display = name.includes(term) ? "flex" : "none";
+            });
+        });
+
+        document.getElementById("leave-btn").addEventListener("click", async () => {
+            if(confirm("Leave this group?")) {
+                await updateDoc(doc(db, "groups", groupId), { members: arrayRemove(currentUser.uid), memberCount: increment(-1) });
+                window.location.href = "/groups";
+            }
+        });
+        document.getElementById("leave-group-menu-btn").addEventListener("click", () => document.getElementById("leave-btn").click());
+
+        document.getElementById("admin-delete-group-btn").addEventListener("click", async () => {
+            if(confirm("PERMANENTLY delete this group?")) {
+                await deleteDoc(doc(db, "groups", groupId));
+            }
+        });
+
+        // Media Modals
+        document.getElementById("see-all-media-btn").addEventListener("click", () => {
+            const grid = document.getElementById("all-media-grid");
+            grid.innerHTML = allMediaUrls.length ? allMediaUrls.map(url => `<div class="aspect-square bg-input-bar rounded-lg bg-cover bg-center cursor-pointer border border-gray-800" style="background-image: url('${url}')" onclick="openPreviewModal('${url}')"></div>`).join('') : "<p class='text-gray-500 col-span-3 text-center mt-10'>No images found.</p>";
+            document.getElementById("all-media-modal").classList.remove("hidden");
+        });
+        document.getElementById("close-media-modal").addEventListener("click", () => document.getElementById("all-media-modal").classList.add("hidden"));
+
+        window.openPreviewModal = (src) => {
+            const m = document.getElementById("preview-modal");
+            document.getElementById("preview-image").src = src;
+            m.classList.remove("hidden");
+            setTimeout(() => { m.classList.remove("opacity-0"); m.querySelector('img').classList.remove("scale-95"); }, 10);
+        };
+        window.closePreviewModal = () => {
+            const m = document.getElementById("preview-modal");
+            m.classList.add("opacity-0"); m.querySelector('img').classList.add("scale-95");
+            setTimeout(() => m.classList.add("hidden"), 300);
+        };
+
+        // Menu Logic
+        const menuBackdrop = document.getElementById("more-menu-backdrop");
+        const menuSheet = document.getElementById("more-menu-sheet");
+        
+        function openMenu() {
+            menuBackdrop.classList.remove("hidden", "flex"); menuBackdrop.classList.add("flex");
+            setTimeout(() => menuSheet.classList.remove("translate-y-full"), 10);
+        }
+        function closeMenu() {
+            menuSheet.classList.add("translate-y-full");
+            setTimeout(() => menuBackdrop.classList.add("hidden"), 300);
+        }
+
+        document.getElementById("more-options-btn").addEventListener("click", openMenu);
+        document.getElementById("group-settings-btn").addEventListener("click", openMenu);
+        document.getElementById("close-more-menu").addEventListener("click", closeMenu);
+        menuBackdrop.addEventListener("click", (e) => { if(e.target === menuBackdrop) closeMenu(); });
 
     </script>
 </body>
