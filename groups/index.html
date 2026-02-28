@@ -2,11 +2,11 @@
 <html lang="en" class="dark">
 <head>
     <meta charset="utf-8"/>
-    <!-- Added viewport-fit=cover for iPhone Notch support -->
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
-    <title>FocusGroup - My Groups</title>
+    <title>FocusGroup - Groups</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     
     <script>
@@ -22,10 +22,10 @@
                         "input-dark": "#2A2A2A",
                     },
                     fontFamily: {
-                        "display": ["Lexend", "sans-serif"]
+                        "display":["Lexend", "sans-serif"],
+                        "poppins": ["Poppins", "sans-serif"]
                     },
                     borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
-                    // Added Safe Area spacing for iPhones
                     spacing: {
                         'safe-bottom': 'env(safe-area-inset-bottom)',
                     }
@@ -37,25 +37,46 @@
         body { font-family: 'Lexend', sans-serif; -webkit-tap-highlight-color: transparent; overscroll-behavior: none; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Tabs System styling */
+        .tab-content { display: none; }
+        #tab-chat:checked ~ .content-area .content-chat { display: block; }
+        #tab-study:checked ~ .content-area .content-study { display: block; }
+        #tab-my-groups:checked ~ .content-area .content-my-groups { display: block; }
+        
+        #tab-chat:checked ~ .tabs-nav label[for="tab-chat"],
+        #tab-study:checked ~ .tabs-nav label[for="tab-study"],
+        #tab-my-groups:checked ~ .tabs-nav label[for="tab-my-groups"] {
+            color: #21c45d;
+            border-bottom-color: #21c45d;
+        }
+
+        /* Modal Slide Up Animation */
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.3s ease-out forwards;
+        }
     </style>
 </head>
-<!-- Changed h-screen to h-[100dvh] for mobile browsers address bar fix -->
-<body class="bg-background-dark text-slate-100 h-[100dvh] flex justify-center overflow-hidden">
+<body class="bg-background-dark text-slate-100 h-[100dvh] flex justify-center overflow-hidden font-poppins">
 
-    <!-- Mobile App Container -->
-    <!-- w-full ensures it fits mobile screens perfectly, max-w-md keeps it looking like an app on desktop -->
-    <div class="w-full max-w-md bg-background-dark h-full flex flex-col relative shadow-2xl overflow-hidden text-white">
+    <!-- MAIN APP SCREEN -->
+    <div id="screen-main" class="w-full max-w-md bg-background-dark h-full flex flex-col relative shadow-2xl overflow-hidden text-white z-10">
         
         <!-- Header -->
-        <div class="flex items-center justify-between px-6 pt-8 pb-4 bg-background-dark z-20 flex-shrink-0">
-            <h1 class="text-2xl font-bold tracking-tight text-white">My Groups</h1>
-            <a href="/create-group" class="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-colors">
+        <div class="flex items-center justify-between px-6 pt-12 pb-4 bg-background-dark z-20 flex-shrink-0">
+            <h1 class="text-2xl font-bold tracking-tight text-white font-display">FocusGroup</h1>
+            <!-- Global Create (Default to create group) -->
+            <a href="../create-group/" class="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-colors">
                 <span class="material-symbols-outlined font-semibold">add</span>
             </a>
         </div>
 
         <!-- Sticky Search -->
-        <div class="px-6 pb-4 bg-background-dark z-20 border-b border-white/5 flex-shrink-0">
+        <div class="px-6 pb-2 bg-background-dark z-20 flex-shrink-0">
             <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <span class="material-symbols-outlined text-slate-400">search</span>
@@ -64,135 +85,73 @@
             </div>
         </div>
 
-        <!-- Scrollable Content -->
-        <div class="flex-1 overflow-y-auto no-scrollbar pb-24 relative">
+        <!-- TABS NAV -->
+        <input class="hidden" id="tab-chat" name="group-tabs" type="radio"/>
+        <input checked="" class="hidden" id="tab-study" name="group-tabs" type="radio"/>
+        <input class="hidden" id="tab-my-groups" name="group-tabs" type="radio"/>
+        
+        <div class="tabs-nav px-6 flex border-b border-white/5 bg-background-dark z-20 flex-shrink-0">
+            <label class="flex-1 text-center py-3 text-sm font-medium text-slate-400 border-b-2 border-transparent cursor-pointer transition-colors hover:text-slate-200" for="tab-chat">Chat Groups</label>
+            <label class="flex-1 text-center py-3 text-sm font-medium text-slate-400 border-b-2 border-transparent cursor-pointer transition-colors hover:text-slate-200" for="tab-study">Study Groups</label>
+            <label class="flex-1 text-center py-3 text-sm font-medium text-slate-400 border-b-2 border-transparent cursor-pointer transition-colors hover:text-slate-200" for="tab-my-groups">My Study</label>
+        </div>
+
+        <!-- Scrollable Content Wrapper -->
+        <div class="flex-1 overflow-y-auto no-scrollbar relative content-area">
             
             <!-- Professional Skeleton Loading -->
-            <div id="loading" class="w-full flex flex-col animate-pulse pt-6">
-                <!-- Studying Now Skeleton -->
+            <div id="loading" class="w-full flex flex-col animate-pulse pt-6 absolute inset-0 z-10 bg-background-dark">
                 <div class="px-6 flex items-center justify-between mb-4">
                     <div class="w-32 h-5 bg-card-dark rounded"></div>
                     <div class="w-12 h-4 bg-card-dark rounded"></div>
                 </div>
                 <div class="flex gap-4 overflow-hidden pb-4 pl-6 pr-6 w-full mb-6">
-                    <!-- Skeleton Card 1 -->
                     <div class="flex-shrink-0 w-64 bg-card-dark p-4 rounded-2xl border border-white/5 relative">
-                        <div class="absolute top-3 right-3 w-12 h-5 bg-input-dark rounded-full"></div>
-                        <div class="w-12 h-12 rounded-lg mb-3 bg-input-dark"></div>
+                        <div class="w-full h-24 bg-input-dark rounded-lg mb-2"></div>
                         <div class="w-3/4 h-4 bg-input-dark rounded mb-2"></div>
-                        <div class="w-1/2 h-3 bg-input-dark rounded mb-4"></div>
-                        <div class="flex -space-x-2 mb-4">
-                            <div class="w-6 h-6 rounded-full bg-input-dark border border-card-dark"></div>
-                            <div class="w-6 h-6 rounded-full bg-input-dark border border-card-dark"></div>
-                        </div>
-                        <div class="w-full h-9 bg-input-dark rounded-lg"></div>
-                    </div>
-                    <!-- Skeleton Card 2 -->
-                    <div class="flex-shrink-0 w-64 bg-card-dark p-4 rounded-2xl border border-white/5 relative">
-                        <div class="absolute top-3 right-3 w-12 h-5 bg-input-dark rounded-full"></div>
-                        <div class="w-12 h-12 rounded-lg mb-3 bg-input-dark"></div>
-                        <div class="w-3/4 h-4 bg-input-dark rounded mb-2"></div>
-                        <div class="w-1/2 h-3 bg-input-dark rounded mb-4"></div>
-                        <div class="flex -space-x-2 mb-4">
-                            <div class="w-6 h-6 rounded-full bg-input-dark border border-card-dark"></div>
-                            <div class="w-6 h-6 rounded-full bg-input-dark border border-card-dark"></div>
-                        </div>
-                        <div class="w-full h-9 bg-input-dark rounded-lg"></div>
-                    </div>
-                </div>
-
-                <!-- All Groups Skeleton -->
-                <div class="px-6 pb-6">
-                    <div class="w-28 h-5 bg-card-dark rounded mb-4"></div>
-                    <div class="flex flex-col gap-3">
-                        <!-- Skeleton List Item 1 -->
-                        <div class="flex items-center p-3 bg-card-dark rounded-xl border border-white/5">
-                            <div class="w-16 h-16 rounded-lg bg-input-dark mr-4 flex-shrink-0"></div>
-                            <div class="flex-1">
-                                <div class="flex justify-between items-start mb-2">
-                                    <div class="w-32 h-4 bg-input-dark rounded"></div>
-                                    <div class="w-12 h-4 bg-input-dark rounded-full"></div>
-                                </div>
-                                <div class="w-24 h-3 bg-input-dark rounded mb-3"></div>
-                                <div class="flex gap-2 items-center">
-                                    <div class="flex -space-x-1.5">
-                                        <div class="w-5 h-5 rounded-full bg-input-dark border border-card-dark"></div>
-                                        <div class="w-5 h-5 rounded-full bg-input-dark border border-card-dark"></div>
-                                    </div>
-                                    <div class="w-16 h-3 bg-input-dark rounded"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Skeleton List Item 2 -->
-                        <div class="flex items-center p-3 bg-card-dark rounded-xl border border-white/5">
-                            <div class="w-16 h-16 rounded-lg bg-input-dark mr-4 flex-shrink-0"></div>
-                            <div class="flex-1">
-                                <div class="flex justify-between items-start mb-2">
-                                    <div class="w-40 h-4 bg-input-dark rounded"></div>
-                                    <div class="w-12 h-4 bg-input-dark rounded-full"></div>
-                                </div>
-                                <div class="w-20 h-3 bg-input-dark rounded mb-3"></div>
-                                <div class="flex gap-2 items-center">
-                                    <div class="flex -space-x-1.5">
-                                        <div class="w-5 h-5 rounded-full bg-input-dark border border-card-dark"></div>
-                                    </div>
-                                    <div class="w-12 h-3 bg-input-dark rounded"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Skeleton List Item 3 -->
-                        <div class="flex items-center p-3 bg-card-dark rounded-xl border border-white/5">
-                            <div class="w-16 h-16 rounded-lg bg-input-dark mr-4 flex-shrink-0"></div>
-                            <div class="flex-1">
-                                <div class="flex justify-between items-start mb-2">
-                                    <div class="w-28 h-4 bg-input-dark rounded"></div>
-                                    <div class="w-12 h-4 bg-input-dark rounded-full"></div>
-                                </div>
-                                <div class="w-32 h-3 bg-input-dark rounded mb-3"></div>
-                                <div class="flex gap-2 items-center">
-                                    <div class="flex -space-x-1.5">
-                                        <div class="w-5 h-5 rounded-full bg-input-dark border border-card-dark"></div>
-                                        <div class="w-5 h-5 rounded-full bg-input-dark border border-card-dark"></div>
-                                        <div class="w-5 h-5 rounded-full bg-input-dark border border-card-dark"></div>
-                                    </div>
-                                    <div class="w-20 h-3 bg-input-dark rounded"></div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Main Tab Contents -->
             <div id="content-area" class="hidden">
                 
-                <!-- Section 1: Studying Now (Joined Groups) -->
-                <div id="joined-section" class="pt-6 hidden transition-all duration-300 relative group/section">
-                    <div class="px-6 flex items-center justify-between mb-4">
-                        <h2 class="text-lg font-bold text-slate-100">Studying Now</h2>
-                        <!-- See All Button -->
-                        <button id="see-all-btn" class="text-sm font-medium text-primary hover:text-primary/80 transition-colors">See all</button>
-                    </div>
-                    
-                    <!-- Container Wrapper for Positioning Icon -->
-                    <div class="relative">
-                        <!-- Horizontal Scroll Container -->
-                        <!-- Added pr-6 to fix last card clipping on mobile -->
-                        <div id="joined-list" class="flex gap-4 overflow-x-auto no-scrollbar pb-4 pl-6 pr-6 w-full snap-x snap-mandatory touch-pan-x scroll-smooth">
-                            <!-- JS Injected Cards Go Here -->
+                <!-- TAB 1: Chat Groups (Type: 'chat' or undefined) -->
+                <div class="content-chat tab-content pb-24">
+                    <!-- Section: All Chat Groups -->
+                    <div class="px-6 pt-6 pb-6">
+                        <h2 class="text-lg font-bold text-slate-100 mb-4 font-display">Community Chats</h2>
+                        <div id="chat-list" class="flex flex-col gap-3">
+                            <!-- JS Injected Chat Cards -->
                         </div>
-
-                        <!-- DESKTOP SCROLL ICON (Hidden on Mobile) -->
-                        <button id="scroll-right-btn" class="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-black/60 hover:bg-black/80 backdrop-blur-md rounded-full items-center justify-center text-white border border-white/10 shadow-lg transition-all active:scale-95">
-                            <span class="material-symbols-outlined">arrow_forward</span>
-                        </button>
                     </div>
                 </div>
 
-                <!-- Section 2: All Groups (Unjoined Groups) -->
-                <div id="unjoined-section" class="px-6 pt-2 pb-6 hidden">
-                    <h2 class="text-lg font-bold text-slate-100 mb-4">All Groups</h2>
-                    <div id="unjoined-list" class="flex flex-col gap-3">
-                         <!-- JS Injected Cards Go Here -->
+                <!-- TAB 2: Study Groups (Type: 'study') - Live Room Style -->
+                <div class="content-study tab-content pb-24">
+                    <div id="study-groups-list" class="pt-4 px-4 pb-6 space-y-3">
+                        <!-- JS Injected Study Group Cards -->
+                    </div>
+                    
+                    <!-- Create Study Room Button -->
+                    <div class="fixed bottom-24 right-6 z-30 md:absolute">
+                        <a href="../study-room/" class="w-14 h-14 bg-primary rounded-full shadow-lg shadow-primary/30 flex items-center justify-center text-white hover:bg-green-600 transition-colors">
+                            <span class="material-symbols-outlined text-[28px]">add</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- TAB 3: My Groups (ONLY Joined 'study' type groups) -->
+                <div class="content-my-groups tab-content pb-24">
+                    <div class="flex items-center justify-between px-6 pt-6 pb-2">
+                        <h2 class="text-xl font-bold text-slate-100 font-display">My Live Rooms</h2>
+                        <div class="relative cursor-pointer hover:bg-white/5 p-2 rounded-full transition-colors">
+                            <span class="material-symbols-outlined text-slate-300">notifications</span>
+                            <span class="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-background-dark"></span>
+                        </div>
+                    </div>
+                    <div id="my-groups-list-container" class="px-4 pb-6 space-y-3">
+                        <!-- JS Injected My Group Cards -->
                     </div>
                 </div>
 
@@ -204,10 +163,9 @@
         </div>
 
         <!-- Bottom Navigation (Fixed) -->
-        <!-- Added pb-safe-bottom for iPhone home bar support -->
         <div class="bg-background-dark border-t border-white/5 absolute bottom-0 w-full z-30 pb-safe-bottom">
             <div class="flex justify-between items-center px-6 py-3 pb-5">
-                <a class="flex flex-col items-center gap-1 group w-1/5" href="/dashboard">
+                <a class="flex flex-col items-center gap-1 group w-1/5" href="../dashboard/">
                     <span class="material-symbols-outlined text-slate-500 group-hover:text-primary transition-colors">home</span>
                     <span class="text-[10px] font-medium text-slate-500 group-hover:text-primary transition-colors">Home</span>
                 </a>
@@ -215,7 +173,7 @@
                     <span class="material-symbols-outlined text-slate-500 group-hover:text-primary transition-colors">calendar_month</span>
                     <span class="text-[10px] font-medium text-slate-500 group-hover:text-primary transition-colors">Calendar</span>
                 </a>
-                <a class="flex flex-col items-center gap-1 group w-1/5" href="/groups">
+                <a class="flex flex-col items-center gap-1 group w-1/5" href="#">
                     <span class="material-symbols-outlined text-primary font-semibold filled">groups</span>
                     <span class="text-[10px] font-medium text-primary">Groups</span>
                 </a>
@@ -223,11 +181,16 @@
                     <span class="material-symbols-outlined text-slate-500 group-hover:text-primary transition-colors">smart_toy</span>
                     <span class="text-[10px] font-medium text-slate-500 group-hover:text-primary transition-colors">AI</span>
                 </a>
-                <a class="flex flex-col items-center gap-1 group w-1/5" href="/profile">
+                <a class="flex flex-col items-center gap-1 group w-1/5" href="../profile/">
                     <span class="material-symbols-outlined text-slate-500 group-hover:text-primary transition-colors">person</span>
                     <span class="text-[10px] font-medium text-slate-500 group-hover:text-primary transition-colors">Profile</span>
                 </a>
             </div>
+        </div>
+
+        <!-- Simple Preview Modal (Optional, kept for Chat Groups only) -->
+        <div id="group-info-modal" class="absolute inset-0 z-[100] hidden flex flex-col justify-end">
+            <!-- Modal code for chat groups if needed, but primary interaction is direct link -->
         </div>
 
     </div>
@@ -250,9 +213,7 @@
 
         let allGroups =[];
         let currentUserUid = null;
-        let isExpanded = false; 
 
-        // Cache for user avatars to reduce reads
         const avatarCache = {};
 
         onAuthStateChanged(auth, (user) => {
@@ -260,49 +221,7 @@
                 currentUserUid = user.uid;
                 loadAllGroups(); 
             } else { 
-                window.location.href = "/auth"; 
-            }
-        });
-
-        // "See All" Toggle Logic
-        document.getElementById('see-all-btn').addEventListener('click', function() {
-            const list = document.getElementById('joined-list');
-            const btn = document.getElementById('see-all-btn');
-            const unjoinedSection = document.getElementById('unjoined-section');
-            const scrollBtn = document.getElementById('scroll-right-btn');
-            
-            isExpanded = !isExpanded;
-
-            if (isExpanded) {
-                // Expanded View (Vertical Grid)
-                list.classList.remove('flex', 'overflow-x-auto', 'gap-4', 'snap-x', 'snap-mandatory', 'touch-pan-x', 'pl-6', 'pr-6'); // Removed padding in grid
-                list.classList.add('grid', 'grid-cols-1', 'gap-4');
-                unjoinedSection.classList.add('hidden'); 
-                scrollBtn.classList.add('!hidden'); 
-                btn.textContent = "Show less";
-            } else {
-                // Collapsed View (Horizontal Scroll)
-                list.classList.remove('grid', 'grid-cols-1', 'gap-4');
-                list.classList.add('flex', 'overflow-x-auto', 'gap-4', 'snap-x', 'snap-mandatory', 'touch-pan-x', 'pl-6', 'pr-6'); // Re-added padding
-                unjoinedSection.classList.remove('hidden');
-                scrollBtn.classList.remove('!hidden'); 
-                btn.textContent = "See all";
-            }
-            renderGroups(allGroups);
-        });
-
-        // Desktop Scroll Button Logic
-        document.getElementById('scroll-right-btn').addEventListener('click', () => {
-            const container = document.getElementById('joined-list');
-            container.scrollBy({ left: 280, behavior: 'smooth' });
-        });
-
-        // Mouse Wheel Scroll for Desktop
-        const joinedListContainer = document.getElementById('joined-list');
-        joinedListContainer.addEventListener('wheel', (e) => {
-            if (!isExpanded && e.deltaY !== 0) {
-                e.preventDefault();
-                joinedListContainer.scrollLeft += e.deltaY;
+                window.location.href = "../auth/"; 
             }
         });
 
@@ -325,165 +244,158 @@
         }
 
         function renderGroups(groupsToRender) {
-            const joinedList = document.getElementById('joined-list');
-            const unjoinedList = document.getElementById('unjoined-list');
-            const joinedSection = document.getElementById('joined-section');
-            const unjoinedSection = document.getElementById('unjoined-section');
+            const chatList = document.getElementById('chat-list');
+            const studyListContainer = document.getElementById('study-groups-list');
+            const myGroupsListContainer = document.getElementById('my-groups-list-container');
             const noResults = document.getElementById('no-results');
 
-            joinedList.innerHTML = '';
-            unjoinedList.innerHTML = '';
-
-            const joinedGroups = groupsToRender.filter(g => g.members && g.members.includes(currentUserUid));
-            const unjoinedGroups = groupsToRender.filter(g => !g.members || !g.members.includes(currentUserUid));
+            chatList.innerHTML = '';
+            studyListContainer.innerHTML = '';
+            myGroupsListContainer.innerHTML = '';
 
             if (groupsToRender.length === 0) {
                 noResults.classList.remove('hidden');
-                joinedSection.classList.add('hidden');
-                unjoinedSection.classList.add('hidden');
                 return;
             } else {
                 noResults.classList.add('hidden');
             }
 
-            // Render Joined (Studying Now)
-            if (joinedGroups.length > 0) {
-                joinedSection.classList.remove('hidden');
-                joinedGroups.forEach(group => {
-                    joinedList.insertAdjacentHTML('beforeend', getJoinedCardHTML(group, isExpanded));
-                    fetchAndRenderMemberAvatars(group.id, group.members);
-                });
-            } else {
-                joinedSection.classList.add('hidden');
-            }
+            // FILTERING LOGIC
+            // 1. Study Groups: groups where type == 'study'
+            // 2. Chat Groups: groups where type != 'study' (or undefined)
+            // 3. My Groups: Only 'study' groups the user has JOINED.
 
-            // Render Unjoined
-            if (unjoinedGroups.length > 0) {
-                if(!isExpanded) unjoinedSection.classList.remove('hidden');
-                unjoinedGroups.forEach(group => {
-                    unjoinedList.insertAdjacentHTML('beforeend', getUnjoinedCardHTML(group));
-                    fetchAndRenderMemberAvatars(group.id, group.members); 
+            const studyGroups = groupsToRender.filter(g => g.type === 'study');
+            const chatGroups = groupsToRender.filter(g => g.type !== 'study');
+            const myJoinedStudyGroups = studyGroups.filter(g => g.members && g.members.includes(currentUserUid));
+
+            // --- 1. POPULATE CHAT GROUPS TAB ---
+            chatGroups.forEach(group => {
+                chatList.insertAdjacentHTML('beforeend', getChatGroupCardHTML(group));
+            });
+            if(chatGroups.length === 0) chatList.innerHTML = `<p class="text-slate-500 text-sm text-center">No community chats found.</p>`;
+
+            // --- 2. POPULATE STUDY GROUPS TAB (Links to Live Study Room) ---
+            studyGroups.forEach(group => {
+                studyListContainer.insertAdjacentHTML('beforeend', getStudyGroupCardHTML(group));
+            });
+            if(studyGroups.length === 0) studyListContainer.innerHTML = `<p class="text-slate-500 text-sm text-center">No live study rooms active.</p>`;
+
+            // --- 3. POPULATE MY GROUPS TAB (Only Joined Study Groups) ---
+            if(myJoinedStudyGroups.length > 0) {
+                myJoinedStudyGroups.forEach(group => {
+                    myGroupsListContainer.insertAdjacentHTML('beforeend', getMyJoinedCardHTML(group));
                 });
             } else {
-                unjoinedSection.classList.add('hidden');
+                myGroupsListContainer.innerHTML = `<p class="text-slate-500 text-sm text-center py-4">You haven't joined any live study rooms yet.</p>`;
             }
         }
 
-        // --- Card Generators ---
-
-        function getJoinedCardHTML(group, isFullWidth) {
+        // --- Card Generator: Chat Groups (Links to group-preview or group-chat) ---
+        function getChatGroupCardHTML(group) {
             const bgImage = group.groupIcon ? `url('${group.groupIcon}')` : 'none';
             const bgColor = group.groupIcon ? 'bg-cover bg-center' : 'bg-slate-700 flex items-center justify-center';
-            const iconContent = group.groupIcon ? '' : '<span class="material-symbols-outlined text-2xl text-slate-400">groups</span>';
-            const widthClass = isFullWidth ? 'w-full' : 'w-64';
-
-            return `
-            <div onclick="window.location.href='/group-chat?id=${group.id}'" class="flex-shrink-0 ${widthClass} bg-card-dark p-4 rounded-2xl border border-white/5 relative group cursor-pointer hover:shadow-md transition-all snap-start">
-                <div class="absolute top-3 right-3 flex items-center gap-1 bg-black/40 backdrop-blur-sm px-2 py-1 rounded-full border border-white/10">
-                    <span class="block w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                    <span class="text-xs font-bold text-primary">Live</span>
-                </div>
-                
-                <div class="w-12 h-12 rounded-lg mb-3 shadow-sm border border-white/5 ${bgColor}" style="background-image: ${bgImage};">
-                    ${iconContent}
-                </div>
-
-                <h3 class="font-bold text-white mb-1 truncate">${group.name}</h3>
-                <p class="text-xs text-slate-400 mb-3 truncate">${group.category || 'General'} • ${group.memberCount || 1} members</p>
-                
-                <div class="flex -space-x-2 overflow-hidden mb-3 h-6 items-center" id="members-${group.id}">
-                    <div class="w-6 h-6 rounded-full bg-slate-700 border border-card-dark animate-pulse"></div>
-                    <div class="w-6 h-6 rounded-full bg-slate-700 border border-card-dark animate-pulse"></div>
-                </div>
-
-                <button class="w-full py-2 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-green-600 transition-colors">Join Session</button>
-            </div>`;
-        }
-
-        function getUnjoinedCardHTML(group) {
-            const bgImage = group.groupIcon ? `url('${group.groupIcon}')` : 'none';
-            const bgColor = group.groupIcon ? 'bg-cover bg-center' : 'bg-slate-700 flex items-center justify-center';
-            const iconContent = group.groupIcon ? '' : '<span class="material-symbols-outlined text-2xl text-slate-400">groups</span>';
+            const iconContent = group.groupIcon ? '' : '<span class="material-symbols-outlined text-2xl text-slate-400">forum</span>';
             const isPrivate = group.privacy === 'private';
 
             return `
-            <div onclick="window.location.href='/group-preview?id=${group.id}'" class="flex items-center p-3 bg-card-dark rounded-xl border border-white/5 shadow-sm hover:border-white/10 transition-colors cursor-pointer">
-                <div class="relative w-16 h-16 flex-shrink-0 mr-4">
+            <div onclick="window.location.href='../group-chat/?id=${group.id}'" class="flex items-center p-3 bg-card-dark rounded-xl border border-white/5 shadow-sm hover:border-white/10 transition-colors cursor-pointer">
+                <div class="relative w-14 h-14 flex-shrink-0 mr-4">
                     <div class="w-full h-full rounded-lg ${bgColor} border border-white/5" style="background-image: ${bgImage};">
                         ${iconContent}
                     </div>
-                     ${!isPrivate ? `
-                    <div class="absolute -bottom-1 -right-1 bg-card-dark rounded-full p-0.5">
-                         <span class="flex items-center justify-center w-5 h-5 bg-primary rounded-full text-[10px] text-white font-bold">${(group.members?.length || 1)}</span>
-                    </div>` : ''}
                 </div>
                 <div class="flex-1 min-w-0">
                     <div class="flex justify-between items-start">
                         <h3 class="text-base font-bold text-white truncate pr-2">${group.name}</h3>
-                        ${!isPrivate 
-                            ? `<span class="text-xs text-primary font-medium bg-primary/10 px-2 py-0.5 rounded-full flex-shrink-0">Active</span>`
-                            : `<span class="text-xs text-slate-400 font-medium bg-slate-700/50 px-2 py-0.5 rounded-full flex-shrink-0">Private</span>`
+                        ${isPrivate 
+                            ? `<span class="text-[10px] text-slate-400 border border-slate-700 px-1.5 rounded flex-shrink-0">Private</span>`
+                            : `<span class="text-[10px] text-primary border border-primary/30 px-1.5 rounded flex-shrink-0">Public</span>`
                         }
                     </div>
-                    <p class="text-sm text-slate-400 truncate mt-0.5">${group.category || 'Study Group'}</p>
-                    <div class="flex items-center gap-2 mt-2">
-                        <div class="flex -space-x-1.5 h-5 items-center" id="members-small-${group.id}">
-                            <div class="w-5 h-5 rounded-full bg-slate-700 border border-card-dark"></div>
-                        </div>
-                        <span class="text-xs text-slate-400 font-medium">• ${group.members?.length || 1} members</span>
+                    <p class="text-sm text-slate-400 truncate mt-0.5">${group.category || 'Community Chat'}</p>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="text-xs text-slate-500 font-medium">${group.members?.length || 1} members</span>
                     </div>
                 </div>
-                <div class="ml-2 flex-shrink-0 text-slate-500">
-                    <span class="material-symbols-outlined">chevron_right</span>
+                <span class="material-symbols-outlined text-slate-500">chevron_right</span>
+            </div>`;
+        }
+
+        // --- Card Generator: Study Groups (Links to ../live-study-room/) ---
+        function getStudyGroupCardHTML(group) {
+            const goal = group.goal || '8h';
+            const membersCount = group.members?.length || 1;
+            const totalCapacity = group.maxMembers || 50;
+            const attd = group.attendance || '99%';
+            const time = group.time || '0h 0m';
+
+            // Direct link to Live Study Room
+            return `
+            <div class="bg-card-dark/40 rounded-[12px] p-4 border-b border-white/5 shadow-sm active:bg-card-dark/60 transition-colors cursor-pointer" onclick="window.location.href='../live-study-room/?id=${group.id}'">
+                <div class="flex flex-col gap-3">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1 min-w-0 pr-2">
+                            <h3 class="text-base font-bold text-slate-100 flex items-center gap-2 truncate">
+                                <span class="text-lg">${group.icon || '📚'}</span> ${group.name}
+                            </h3>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="flex items-center gap-1 text-[10px] text-primary bg-primary/10 px-2 py-0.5 rounded-full font-medium border border-primary/20">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span> Live
+                                </span>
+                                <span class="text-xs text-slate-500">${group.category || 'Study Session'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-4 gap-2 pt-1">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5 font-medium">Goal</span>
+                            <span class="text-xs font-semibold text-slate-200">${goal}</span>
+                        </div>
+                        <div class="flex flex-col border-l border-white/5 pl-3">
+                            <span class="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5 font-medium">Studying</span>
+                            <span class="text-xs font-semibold text-slate-200">${membersCount}<span class="text-slate-500 text-[10px] font-normal">/${totalCapacity}</span></span>
+                        </div>
+                        <div class="flex flex-col border-l border-white/5 pl-3">
+                            <span class="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5 font-medium">Attd.</span>
+                            <span class="text-xs font-semibold text-primary">${attd}</span>
+                        </div>
+                        <div class="flex flex-col border-l border-white/5 pl-3">
+                            <span class="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5 font-medium">Time</span>
+                            <span class="text-xs font-semibold text-slate-200">${time}</span>
+                        </div>
+                    </div>
                 </div>
             </div>`;
         }
 
-        async function fetchAndRenderMemberAvatars(groupId, memberIds) {
-            if (!memberIds || memberIds.length === 0) return;
+        // --- Card Generator: My Joined Study Rooms ---
+        function getMyJoinedCardHTML(group) {
+            const bgImage = group.groupIcon ? `url('${group.groupIcon}')` : 'none';
+            const bgColor = group.groupIcon ? 'bg-cover bg-center' : 'bg-slate-700 flex items-center justify-center';
+            const iconContent = group.groupIcon ? '' : '<span class="material-symbols-outlined text-2xl text-slate-400">auto_stories</span>';
 
-            const previewMembers = memberIds.slice(0, 3);
-            const extraCount = memberIds.length > 3 ? memberIds.length - 3 : 0;
-            
-            let avatarsHTML = '';
-
-            for (const uid of previewMembers) {
-                let photoURL = '';
-                if (avatarCache[uid]) {
-                    photoURL = avatarCache[uid];
-                } else {
-                    try {
-                        const userDoc = await getDoc(doc(db, "users", uid));
-                        if (userDoc.exists() && userDoc.data().photoURL) {
-                            photoURL = userDoc.data().photoURL;
-                        } else {
-                            photoURL = 'DEFAULT_ICON'; 
-                        }
-                        avatarCache[uid] = photoURL;
-                    } catch (e) {
-                        console.error("Error fetching user:", e);
-                        photoURL = 'DEFAULT_ICON';
-                    }
-                }
-
-                if (photoURL === 'DEFAULT_ICON') {
-                    avatarsHTML += `<div class="inline-block h-6 w-6 rounded-full ring-2 ring-card-dark bg-slate-600 flex items-center justify-center text-[10px] text-white font-bold">U</div>`;
-                } else {
-                    avatarsHTML += `<img class="inline-block h-6 w-6 rounded-full ring-2 ring-card-dark object-cover" src="${photoURL}" alt="Member" />`;
-                }
-            }
-
-            if (extraCount > 0) {
-                avatarsHTML += `<div class="flex items-center justify-center h-6 w-6 rounded-full ring-2 ring-card-dark bg-slate-700 text-[10px] font-bold text-slate-300">+${extraCount}</div>`;
-            }
-
-            const container = document.getElementById(`members-${groupId}`);
-            if (container) container.innerHTML = avatarsHTML;
-
-            const smallContainer = document.getElementById(`members-small-${groupId}`);
-            if (smallContainer) {
-                 smallContainer.innerHTML = avatarsHTML.replace(/h-6 w-6/g, 'h-5 w-5');
-            }
+            // Links to live study room
+            return `
+            <div class="bg-card-dark rounded-xl p-4 border border-white/5 shadow-sm active:bg-card-dark/60 hover:border-primary/30 transition-all cursor-pointer group" onclick="window.location.href='../live-study-room/?id=${group.id}'">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 flex-shrink-0 rounded-lg ${bgColor} border border-white/5" style="background-image: ${bgImage};">
+                        ${iconContent}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-base font-bold text-white truncate group-hover:text-primary transition-colors">${group.name}</h3>
+                        <p class="text-xs text-slate-400 truncate mt-1">${group.category || 'General'} • ${group.members?.length || 1} members</p>
+                        <div class="flex items-center gap-2 mt-2">
+                            <span class="flex items-center gap-1 text-[10px] text-primary bg-primary/10 px-2 py-0.5 rounded-full font-medium">
+                                <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span> Active Now
+                            </span>
+                        </div>
+                    </div>
+                    <div class="text-slate-500">
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </div>
+                </div>
+            </div>`;
         }
 
         document.getElementById('search-input').addEventListener('input', (e) => {

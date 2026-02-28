@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script>
+    <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
             theme: {
@@ -15,12 +15,27 @@
                     colors: {
                         "primary": "#22C55E",
                         "primary-dark": "#16a34a",
+                        "primary-light": "#dcfce7",
+                        "background-light": "#121212", 
                         "background-dark": "#121212",
                         "surface-light": "#1E1E1E",
+                        "surface-dark": "#1E1E1E",
+                        "text-main": "#ffffff",
+                        "text-secondary": "#9ca3af",
                         "card-border": "#2d2d2d",
+                        "nav-bg": "#1E1E1E",
+                        "nav-border": "#2d2d2d",
                         "input-dark": "#2A2A2A",
                     },
-                    fontFamily: { "display":["Lexend", "sans-serif"] }
+                    fontFamily: {
+                        "display":["Lexend", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
                 },
             },
         }
@@ -29,20 +44,21 @@
         body { font-family: 'Lexend', sans-serif; -webkit-tap-highlight-color: transparent; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        body { min-height: max(884px, 100dvh); }
         .font-variation-settings-fill { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
     </style>
 </head>
-<body class="bg-black text-white antialiased selection:bg-primary selection:text-white flex justify-center min-h-screen">
+<body class="bg-[#121212] text-text-main antialiased selection:bg-primary selection:text-white flex justify-center min-h-screen">
 
     <!-- Mobile App Container -->
-    <div class="w-full max-w-md bg-background-dark h-[100dvh] flex flex-col relative shadow-2xl overflow-hidden border-x border-card-border/30">
+    <div class="w-full max-w-md bg-[#121212] h-[100dvh] flex flex-col relative shadow-2xl overflow-hidden border-x border-card-border/30">
 
         <!-- Global Loader (Professional Skeleton Loading) -->
-        <div id="global-loader" class="absolute inset-0 z-[100] bg-background-dark flex flex-col pt-4 px-5 overflow-hidden">
+        <div id="global-loader" class="absolute inset-0 z-[100] bg-[#121212] flex flex-col pt-4 px-4 overflow-hidden">
             <!-- Header Skeleton -->
             <div class="flex items-center justify-between pb-4 border-b border-card-border mb-5">
                 <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 bg-surface-light rounded-full animate-pulse"></div>
+                    <div class="w-10 h-10 bg-surface-light rounded-full animate-pulse"></div>
                     <div class="flex flex-col gap-2">
                         <div class="w-16 h-2.5 bg-surface-light rounded animate-pulse"></div>
                         <div class="w-24 h-4 bg-surface-light rounded animate-pulse"></div>
@@ -55,73 +71,61 @@
             </div>
             
             <!-- Main Content Skeleton -->
-            <div class="flex flex-col gap-6">
+            <div class="flex flex-col gap-5">
                 <!-- Goal Card Skeleton -->
-                <div class="w-full h-[140px] bg-surface-light rounded-3xl animate-pulse"></div>
+                <div class="w-full h-[150px] bg-surface-light rounded-2xl animate-pulse"></div>
                 
                 <!-- Stats Grid Skeleton -->
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="h-36 bg-surface-light rounded-3xl animate-pulse"></div>
-                    <div class="h-36 bg-surface-light rounded-3xl animate-pulse"></div>
+                    <div class="h-32 bg-surface-light rounded-2xl animate-pulse"></div>
+                    <div class="h-32 bg-surface-light rounded-2xl animate-pulse"></div>
                 </div>
                 
                 <!-- Active Session Skeleton -->
-                <div class="w-full h-24 bg-surface-light rounded-3xl animate-pulse"></div>
+                <div class="w-full h-32 bg-surface-light rounded-2xl animate-pulse"></div>
                 
                 <!-- Quick Access Skeleton -->
                 <div>
                     <div class="w-32 h-4 bg-surface-light rounded mb-4 animate-pulse"></div>
                     <div class="grid grid-cols-4 gap-3">
-                        <div class="flex flex-col items-center gap-2.5">
-                            <div class="h-14 w-14 bg-surface-light rounded-2xl animate-pulse"></div>
-                            <div class="w-10 h-2 bg-surface-light rounded animate-pulse"></div>
-                        </div>
-                        <div class="flex flex-col items-center gap-2.5">
-                            <div class="h-14 w-14 bg-surface-light rounded-2xl animate-pulse"></div>
-                            <div class="w-10 h-2 bg-surface-light rounded animate-pulse"></div>
-                        </div>
-                        <div class="flex flex-col items-center gap-2.5">
-                            <div class="h-14 w-14 bg-surface-light rounded-2xl animate-pulse"></div>
-                            <div class="w-10 h-2 bg-surface-light rounded animate-pulse"></div>
-                        </div>
-                        <div class="flex flex-col items-center gap-2.5">
-                            <div class="h-14 w-14 bg-surface-light rounded-2xl animate-pulse"></div>
-                            <div class="w-10 h-2 bg-surface-light rounded animate-pulse"></div>
-                        </div>
+                        <div class="h-14 w-14 bg-surface-light rounded-2xl animate-pulse mx-auto"></div>
+                        <div class="h-14 w-14 bg-surface-light rounded-2xl animate-pulse mx-auto"></div>
+                        <div class="h-14 w-14 bg-surface-light rounded-2xl animate-pulse mx-auto"></div>
+                        <div class="h-14 w-14 bg-surface-light rounded-2xl animate-pulse mx-auto"></div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Header Section -->
-        <header class="flex-shrink-0 z-50 bg-background-dark/95 backdrop-blur-md px-5 py-4 flex items-center justify-between border-b border-card-border">
+        <header class="flex-shrink-0 z-50 bg-[#121212]/90 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-card-border">
             <div class="flex items-center gap-3">
                 <!-- Profile Avatar linked to Profile Screen -->
                 <a href="/profile" class="relative block cursor-pointer active:scale-95 transition-transform" title="Go to Profile">
-                    <div id="user-avatar" class="bg-center bg-no-repeat bg-cover rounded-full h-11 w-11 border-2 border-surface-light shadow-sm" style="background-image: url('https://ui-avatars.com/api/?name=User&background=22C55E&color=fff');"></div>
-                    <div class="absolute bottom-0 right-0 h-3.5 w-3.5 bg-primary rounded-full border-2 border-background-dark"></div>
+                    <div id="user-avatar" class="bg-center bg-no-repeat bg-cover rounded-full h-10 w-10 border-2 border-surface-light shadow-sm" style="background-image: url('https://ui-avatars.com/api/?name=User&background=22C55E&color=fff');"></div>
+                    <div class="absolute bottom-0 right-0 h-3 w-3 bg-primary rounded-full border-2 border-[#121212]"></div>
                 </a>
                 <div>
-                    <p id="greeting-text" class="text-[11px] text-gray-400 font-medium uppercase tracking-wider mb-0.5">Good Morning,</p>
-                    <h2 id="user-name" class="text-white text-[17px] font-bold leading-tight pr-2">Welcome 👋</h2>
+                    <p id="greeting-text" class="text-xs text-text-secondary font-medium">Good Morning,</p>
+                    <h2 id="user-name" class="text-white text-lg font-bold leading-tight">Welcome 👋</h2>
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <a href="/notifications" class="bg-surface-light h-10 w-10 flex items-center justify-center rounded-full shadow-sm text-gray-300 hover:text-white hover:bg-card-border transition-colors relative border border-card-border">
-                    <span class="material-symbols-outlined text-[22px]">notifications</span>
-                    <span id="notification-badge" class="absolute top-1.5 right-1.5 hidden h-4 w-4 items-center justify-center bg-red-500 rounded-full border border-surface-light text-[9px] font-bold text-white"></span>
+                <a href="/notifications" class="bg-surface-light p-2 rounded-full shadow-sm text-white hover:bg-[#2a2a2a] transition-colors relative border border-card-border">
+                    <span class="material-symbols-outlined text-[24px]">notifications</span>
+                    <span id="notification-badge" class="absolute top-2 right-2.5 hidden h-2 w-2 bg-red-500 rounded-full border border-surface-light"></span>
                 </a>
-                <button id="logout-btn" class="bg-surface-light h-10 w-10 flex items-center justify-center rounded-full shadow-sm text-red-400 hover:bg-red-500/10 transition-colors border border-card-border" title="Logout">
-                    <span class="material-symbols-outlined text-[20px]">logout</span>
+                <button id="logout-btn" class="bg-surface-light p-2 rounded-full shadow-sm text-red-400 hover:bg-[#2a2a2a] transition-colors border border-card-border" title="Logout">
+                    <span class="material-symbols-outlined text-[24px]">logout</span>
                 </button>
             </div>
         </header>
 
         <!-- Main Content -->
-        <main class="flex-1 overflow-y-auto no-scrollbar pb-28 pt-5 px-5 hidden flex flex-col gap-6" id="main-content">
+        <main class="flex-1 overflow-y-auto no-scrollbar pb-28 pt-4 px-4 hidden flex flex-col gap-5" id="main-content">
             
-            <!-- Today's Goal Card -->
-            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#22C55E] to-emerald-800 shadow-lg text-white ring-1 ring-white/10">
+            <!-- Today's Goal Card (Fixed missing visibility issue) -->
+            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-emerald-800 shadow-lg text-white ring-1 ring-white/10 shrink-0">
                 <div class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
                 <div class="relative p-6 flex flex-col gap-4">
                     <div class="flex justify-between items-start">
@@ -129,45 +133,45 @@
                             <p class="text-emerald-100 text-sm font-medium mb-1">Today's Goal</p>
                             <h1 id="todays-goal" class="text-3xl font-bold tracking-tight">2h 30m</h1>
                         </div>
-                        <div class="bg-white/10 backdrop-blur-md p-2.5 rounded-xl border border-white/10">
+                        <div class="bg-white/10 backdrop-blur-sm p-2 rounded-lg">
                             <span class="material-symbols-outlined text-white text-[24px]">target</span>
                         </div>
                     </div>
-                    <div class="flex items-center justify-between mt-1">
-                        <p class="text-emerald-50/90 text-sm font-medium max-w-[55%] leading-snug">Stay focused and achieve your targets.</p>
-                        <a href="/timer" class="bg-white text-emerald-700 px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm active:scale-95 transition-transform hover:bg-gray-50 flex items-center gap-1.5">
-                            <span class="material-symbols-outlined text-[18px]">play_arrow</span> Start
+                    <div class="flex items-center justify-between mt-2">
+                        <p class="text-emerald-50/90 text-sm font-medium max-w-[60%]">Stay focused and achieve your targets.</p>
+                        <a href="/timer" class="bg-white text-primary-dark px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm active:scale-95 transition-transform hover:bg-gray-100">
+                            Start Studying
                         </a>
                     </div>
                 </div>
             </div>
 
             <!-- Stats Grid -->
-            <div class="grid grid-cols-2 gap-4">
-                <div class="bg-surface-light p-5 rounded-3xl shadow-sm border border-card-border flex flex-col justify-between h-36 relative overflow-hidden group">
-                    <div class="absolute -right-4 -top-4 bg-orange-500/10 rounded-full w-24 h-24 opacity-50 transition-transform duration-500 group-hover:scale-110"></div>
+            <div class="grid grid-cols-2 gap-4 shrink-0">
+                <div class="bg-surface-light p-5 rounded-2xl shadow-sm border border-card-border flex flex-col justify-between h-32 relative overflow-hidden group">
+                    <div class="absolute -right-4 -top-4 bg-orange-500/10 rounded-full w-20 h-20 opacity-50 group-hover:scale-110 transition-transform"></div>
                     <div class="relative z-10">
                         <div class="flex items-center gap-2 mb-2">
-                            <span class="material-symbols-outlined text-orange-400 text-[22px]">local_fire_department</span>
-                            <span class="text-gray-400 text-xs font-semibold uppercase tracking-wider">Streak</span>
+                            <span class="material-symbols-outlined text-orange-400 text-[20px]">local_fire_department</span>
+                            <span class="text-text-secondary text-xs font-semibold uppercase tracking-wide">Streak</span>
                         </div>
-                        <p id="streak-days" class="text-2xl font-bold text-white mt-1">0 Days</p>
+                        <p id="streak-days" class="text-2xl font-bold text-white">0 Days</p>
                     </div>
-                    <div class="relative z-10 flex items-center gap-1.5 text-primary text-xs font-bold mt-auto">
+                    <div class="relative z-10 flex items-center gap-1 text-primary text-xs font-bold mt-auto">
                         <span class="material-symbols-outlined text-[16px]">trending_up</span>
                         <span>Keep it up!</span>
                     </div>
                 </div>
-                <div class="bg-surface-light p-5 rounded-3xl shadow-sm border border-card-border flex flex-col justify-between h-36 relative overflow-hidden group">
-                    <div class="absolute -right-4 -top-4 bg-blue-500/10 rounded-full w-24 h-24 opacity-50 transition-transform duration-500 group-hover:scale-110"></div>
+                <div class="bg-surface-light p-5 rounded-2xl shadow-sm border border-card-border flex flex-col justify-between h-32 relative overflow-hidden group">
+                    <div class="absolute -right-4 -top-4 bg-blue-500/10 rounded-full w-20 h-20 opacity-50 group-hover:scale-110 transition-transform"></div>
                     <div class="relative z-10">
                         <div class="flex items-center gap-2 mb-2">
-                            <span class="material-symbols-outlined text-blue-400 text-[22px]">schedule</span>
-                            <span class="text-gray-400 text-xs font-semibold uppercase tracking-wider">Focused</span>
+                            <span class="material-symbols-outlined text-blue-400 text-[20px]">schedule</span>
+                            <span class="text-text-secondary text-xs font-semibold uppercase tracking-wide">Focused</span>
                         </div>
-                        <p id="focused-time" class="text-2xl font-bold text-white mt-1">0h 0m</p>
+                        <p id="focused-time" class="text-2xl font-bold text-white">0h 0m</p>
                     </div>
-                    <div class="relative z-10 flex items-center gap-1.5 text-primary text-xs font-bold mt-auto">
+                    <div class="relative z-10 flex items-center gap-1 text-primary text-xs font-bold mt-auto">
                         <span class="material-symbols-outlined text-[16px]">arrow_upward</span>
                         <span id="remaining-time">Goal remaining</span>
                     </div>
@@ -175,89 +179,135 @@
             </div>
 
             <!-- Active Session -->
-            <div class="bg-surface-light rounded-3xl p-4 shadow-sm border border-card-border">
-                <div class="flex justify-between items-center mb-4 px-1">
+            <div class="bg-surface-light rounded-2xl p-4 shadow-sm border border-card-border shrink-0">
+                <div class="flex justify-between items-center mb-4">
                     <h3 class="text-white font-bold text-base">Active Session</h3>
-                    <span class="bg-red-500/10 text-red-400 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest border border-red-500/20">Live</span>
+                    <span class="bg-red-500/10 text-red-400 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border border-red-500/20">Live</span>
                 </div>
-                <div class="flex items-center gap-4 bg-background-dark p-3 rounded-2xl border border-card-border">
-                    <div class="relative h-12 w-12 shrink-0">
+                <div class="flex items-center gap-4">
+                    <div class="relative h-14 w-14 shrink-0">
                         <div class="absolute inset-0 bg-indigo-500/20 rounded-xl rotate-6"></div>
-                        <div class="absolute inset-0 bg-surface-light rounded-xl flex items-center justify-center border border-indigo-500/20 shadow-sm">
-                            <span class="material-symbols-outlined text-indigo-400 text-[24px]">groups</span>
+                        <div class="absolute inset-0 bg-indigo-500/10 rounded-xl -rotate-3"></div>
+                        <div class="absolute inset-0 bg-[#252525] rounded-xl flex items-center justify-center border border-indigo-500/20 shadow-sm">
+                            <span class="material-symbols-outlined text-indigo-400 text-[28px]">groups</span>
                         </div>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <h4 class="text-white font-bold text-sm truncate">The Study Squad</h4>
-                        <p class="text-gray-400 text-xs mt-0.5 truncate">Physics Chapter 4</p>
+                        <h4 class="text-white font-bold truncate">The Study Squad</h4>
+                        <p class="text-text-secondary text-xs mt-1 truncate">Physics Chapter 4 Discussion</p>
                     </div>
-                    <a href="/groups" class="h-10 w-10 flex items-center justify-center bg-primary text-white rounded-xl shadow-lg shadow-primary/20 hover:bg-primary-dark transition-colors active:scale-95">
+                    <a href="/groups" class="h-9 w-9 flex items-center justify-center bg-primary text-white rounded-full shadow-md shadow-primary/20 hover:bg-primary-dark transition-colors">
                         <span class="material-symbols-outlined text-[20px]">login</span>
                     </a>
                 </div>
+                <div class="mt-4 flex items-center justify-between border-t border-card-border pt-3">
+                    <div class="flex -space-x-2 overflow-hidden">
+                        <img alt="" class="inline-block h-6 w-6 rounded-full ring-2 ring-[#1E1E1E] object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBez7D2KqzjYiY6eCn3IFXBICrfaJZ1pwv-E0uX0ltmjt043-u2VeumNzmZCQJSXL20DG7zdcFsXKsywlFrYn5bcYZVd2u-agwLOqtF14RSEOEgw8P3c1aAODHzFOf7CtkO1nT8E7Rj19jAwc_opiUYngfKn2d-Tiw_3JB3RuuWzIKv7keR3eEIqlhB3LVINk35Z8WKf6VDs0shm4XAcO0mf2cErOxGlH9sbeNeOMR91bQQgsDOCd9pDncV34mE4atp4S_HbkBfJ-3C"/>
+                        <img alt="" class="inline-block h-6 w-6 rounded-full ring-2 ring-[#1E1E1E] object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuANC3IZTS9LJGoRg-6EOaYmSo_EouFJTMP7D3Mgv0vVTNTzARs_G2JiC4LqkOHsV-gAnn_5ukdEzANYIESex0u-aJ1r9pwuwBP9It36cIfqLCf47faO1l-T7JsiJ1_XnXQ2JHPcyNIAl7CKafWYYL4TG8eWjLMcxHDjspt3zOnw-gk70eE-Wpo6uqA1h328Ac2rGzdVN6UWqO3TQnbWMTd-YKHdGi7an7lT4hI-H3prtp6xFd-ZxEgRX4NU93_d3p0Td_claUspbrso"/>
+                        <img alt="" class="inline-block h-6 w-6 rounded-full ring-2 ring-[#1E1E1E] object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCizoJX_VILlgJtCwgSpiNq4N-D1yCwUMs6e-o4sWlqFJ6_RWPBi2oGtO-qZZ05gnLeQQHl5jQvupR6a30d72u_NgieVz0cDUhcrJUsWIoe0nCtPnRJoNpZbRJp-LB2CZj9Ia1hzmzXafsNMU5FBPagunkNX-nE88By8d6ae4FpYArSaz-WN5w_hwvNmwTJINYFj280DypsCYNSwkwK1L5W8meloYh1RSxrmRxk9ju9p6hdWsEDOea1CJq3TsG8BxlUYzz80NP5tnT2"/>
+                        <div class="h-6 w-6 rounded-full ring-2 ring-[#1E1E1E] bg-[#333] flex items-center justify-center text-[8px] font-bold text-gray-300">+2</div>
+                    </div>
+                    <p class="text-xs text-text-secondary">5 members active</p>
+                </div>
             </div>
 
-            <!-- Quick Access -->
-            <div>
-                <h3 class="text-white font-bold text-base mb-4 px-1">Quick Access</h3>
+            <!-- Quick Access Grid -->
+            <div class="shrink-0">
+                <h3 class="text-white font-bold text-lg mb-3 px-1">Quick Access</h3>
                 <div class="grid grid-cols-4 gap-3">
-                    <a href="/timer" class="flex flex-col items-center gap-2.5 group">
-                        <div class="h-14 w-14 bg-surface-light rounded-2xl flex items-center justify-center border border-card-border group-active:scale-95 transition-all hover:bg-input-dark">
+                    <a href="/timer" class="flex flex-col items-center gap-2 group">
+                        <div class="h-14 w-14 bg-surface-light rounded-2xl flex items-center justify-center shadow-sm border border-card-border group-active:scale-95 transition-all group-hover:border-primary/50 group-hover:shadow-md hover:bg-[#252525]">
                             <span class="material-symbols-outlined text-orange-400 text-[26px]">timer</span>
                         </div>
-                        <span class="text-xs font-medium text-gray-400 group-hover:text-white transition-colors">Timer</span>
+                        <span class="text-xs font-medium text-gray-300">Timer</span>
                     </a>
-                    <a href="/groups" class="flex flex-col items-center gap-2.5 group">
-                        <div class="h-14 w-14 bg-surface-light rounded-2xl flex items-center justify-center border border-card-border group-active:scale-95 transition-all hover:bg-input-dark">
+                    <a href="/groups" class="flex flex-col items-center gap-2 group">
+                        <div class="h-14 w-14 bg-surface-light rounded-2xl flex items-center justify-center shadow-sm border border-card-border group-active:scale-95 transition-all group-hover:border-primary/50 group-hover:shadow-md hover:bg-[#252525]">
                             <span class="material-symbols-outlined text-blue-400 text-[26px]">group</span>
                         </div>
-                        <span class="text-xs font-medium text-gray-400 group-hover:text-white transition-colors">Groups</span>
+                        <span class="text-xs font-medium text-gray-300">Groups</span>
                     </a>
-                    <a href="#" class="flex flex-col items-center gap-2.5 group">
-                        <div class="h-14 w-14 bg-surface-light rounded-2xl flex items-center justify-center border border-card-border group-active:scale-95 transition-all hover:bg-input-dark">
+                    <a href="#" class="flex flex-col items-center gap-2 group">
+                        <div class="h-14 w-14 bg-surface-light rounded-2xl flex items-center justify-center shadow-sm border border-card-border group-active:scale-95 transition-all group-hover:border-primary/50 group-hover:shadow-md hover:bg-[#252525]">
                             <span class="material-symbols-outlined text-purple-400 text-[26px]">calendar_month</span>
                         </div>
-                        <span class="text-xs font-medium text-gray-400 group-hover:text-white transition-colors">Calendar</span>
+                        <span class="text-xs font-medium text-gray-300">Calendar</span>
                     </a>
-                    <a href="#" class="flex flex-col items-center gap-2.5 group">
-                        <div class="h-14 w-14 bg-surface-light rounded-2xl flex items-center justify-center border border-card-border group-active:scale-95 transition-all hover:bg-input-dark">
+                    <a href="#" class="flex flex-col items-center gap-2 group">
+                        <div class="h-14 w-14 bg-surface-light rounded-2xl flex items-center justify-center shadow-sm border border-card-border group-active:scale-95 transition-all group-hover:border-primary/50 group-hover:shadow-md hover:bg-[#252525]">
                             <span class="material-symbols-outlined text-teal-400 text-[26px]">smart_toy</span>
                         </div>
-                        <span class="text-xs font-medium text-gray-400 group-hover:text-white transition-colors">AI Chat</span>
+                        <span class="text-xs font-medium text-gray-300">AI Chat</span>
+                    </a>
+                    <a href="#" class="flex flex-col items-center gap-2 group">
+                        <div class="h-14 w-14 bg-surface-light rounded-2xl flex items-center justify-center shadow-sm border border-card-border group-active:scale-95 transition-all group-hover:border-primary/50 group-hover:shadow-md hover:bg-[#252525]">
+                            <span class="material-symbols-outlined text-yellow-400 text-[26px]">sticky_note_2</span>
+                        </div>
+                        <span class="text-xs font-medium text-gray-300">Notes</span>
+                    </a>
+                    <a href="#" class="flex flex-col items-center gap-2 group">
+                        <div class="h-14 w-14 bg-surface-light rounded-2xl flex items-center justify-center shadow-sm border border-card-border group-active:scale-95 transition-all group-hover:border-primary/50 group-hover:shadow-md hover:bg-[#252525]">
+                            <span class="material-symbols-outlined text-pink-400 text-[26px]">check_circle</span>
+                        </div>
+                        <span class="text-xs font-medium text-gray-300">Tasks</span>
+                    </a>
+                    <a href="#" class="flex flex-col items-center gap-2 group">
+                        <div class="h-14 w-14 bg-surface-light rounded-2xl flex items-center justify-center shadow-sm border border-card-border group-active:scale-95 transition-all group-hover:border-primary/50 group-hover:shadow-md hover:bg-[#252525]">
+                            <span class="material-symbols-outlined text-indigo-400 text-[26px]">emoji_events</span>
+                        </div>
+                        <span class="text-xs font-medium text-gray-300">Ranking</span>
+                    </a>
+                    <a href="#" class="flex flex-col items-center gap-2 group">
+                        <div class="h-14 w-14 bg-surface-light rounded-2xl flex items-center justify-center shadow-sm border border-card-border group-active:scale-95 transition-all group-hover:border-primary/50 group-hover:shadow-md hover:bg-[#252525]">
+                            <span class="material-symbols-outlined text-gray-400 text-[26px]">settings</span>
+                        </div>
+                        <span class="text-xs font-medium text-gray-300">Settings</span>
                     </a>
                 </div>
             </div>
+
+            <!-- Exam Season Promo -->
+            <div class="bg-primary/10 rounded-2xl p-4 flex gap-4 items-start border border-primary/20 mt-2 mb-4 shrink-0">
+                <div class="bg-primary/20 p-2 rounded-lg shrink-0">
+                    <span class="material-symbols-outlined text-primary text-[24px]">campaign</span>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold text-sm">Exam Season is Here! 📚</h4>
+                    <p class="text-text-secondary text-xs mt-1 leading-relaxed">Join the "Final Prep" marathon session happening this weekend. Earn double XP!</p>
+                </div>
+            </div>
+
         </main>
 
-        <!-- Bottom Navigation (Unified) -->
-        <nav class="absolute bottom-0 left-0 right-0 bg-surface-light border-t border-card-border pb-6 pt-3 px-6 flex justify-between items-end z-50">
-            <a class="flex flex-col items-center justify-end gap-1.5 text-primary group" href="/dashboard">
-                <div class="h-8 flex items-center justify-center transition-transform group-active:scale-90">
-                    <span class="material-symbols-outlined text-[28px] font-variation-settings-fill">home</span>
+        <!-- Bottom Navigation -->
+        <nav class="absolute bottom-0 left-0 right-0 bg-[#1E1E1E] border-t border-[#2d2d2d] pb-6 pt-3 px-4 flex justify-between items-end z-50">
+            <a class="flex flex-1 flex-col items-center justify-end gap-1 text-primary group" href="/dashboard">
+                <div class="h-6 flex items-center justify-center transition-transform group-active:scale-90">
+                    <span class="material-symbols-outlined text-[26px] font-variation-settings-fill">home</span>
                 </div>
                 <p class="text-[10px] font-medium leading-none">Home</p>
             </a>
-            <a class="flex flex-col items-center justify-end gap-1.5 text-gray-400 group hover:text-gray-200 transition-colors" href="#">
-                <div class="h-8 flex items-center justify-center transition-transform group-active:scale-90">
-                    <span class="material-symbols-outlined text-[28px]">calendar_month</span>
+            <a class="flex flex-1 flex-col items-center justify-end gap-1 text-text-secondary group hover:text-primary transition-colors" href="#">
+                <div class="h-6 flex items-center justify-center transition-transform group-active:scale-90">
+                    <span class="material-symbols-outlined text-[26px]">calendar_month</span>
                 </div>
                 <p class="text-[10px] font-medium leading-none">Calendar</p>
             </a>
-            <a class="flex flex-col items-center justify-end gap-1.5 text-gray-400 group hover:text-gray-200 transition-colors" href="/groups">
-                <div class="h-8 flex items-center justify-center transition-transform group-active:scale-90">
-                    <span class="material-symbols-outlined text-[28px]">groups</span>
+            <a class="flex flex-1 flex-col items-center justify-end gap-1 text-text-secondary group hover:text-primary transition-colors" href="/groups">
+                <div class="h-6 flex items-center justify-center transition-transform group-active:scale-90">
+                    <span class="material-symbols-outlined text-[26px]">groups</span>
                 </div>
                 <p class="text-[10px] font-medium leading-none">Groups</p>
             </a>
-            <a class="flex flex-col items-center justify-end gap-1.5 text-gray-400 group hover:text-gray-200 transition-colors" href="#">
-                <div class="h-8 flex items-center justify-center transition-transform group-active:scale-90">
-                    <span class="material-symbols-outlined text-[28px]">smart_toy</span>
+            <a class="flex flex-1 flex-col items-center justify-end gap-1 text-text-secondary group hover:text-primary transition-colors" href="#">
+                <div class="h-6 flex items-center justify-center transition-transform group-active:scale-90">
+                    <span class="material-symbols-outlined text-[26px]">smart_toy</span>
                 </div>
                 <p class="text-[10px] font-medium leading-none">AI</p>
             </a>
-            <a class="flex flex-col items-center justify-end gap-1.5 text-gray-400 group hover:text-gray-200 transition-colors" href="/profile">
-                <div class="h-8 flex items-center justify-center transition-transform group-active:scale-90">
-                    <span class="material-symbols-outlined text-[28px]">person</span>
+            <a class="flex flex-1 flex-col items-center justify-end gap-1 text-text-secondary group hover:text-primary transition-colors" href="/profile">
+                <div class="h-6 flex items-center justify-center transition-transform group-active:scale-90">
+                    <span class="material-symbols-outlined text-[26px]">person</span>
                 </div>
                 <p class="text-[10px] font-medium leading-none">Profile</p>
             </a>

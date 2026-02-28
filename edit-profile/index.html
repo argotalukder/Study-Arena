@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>FocusGroup - Edit Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#22C55E",
+                        "primary-dark": "#16a34a",
+                        "background-dark": "#121212",
+                        "surface-light": "#1E1E1E",
+                        "card-border": "#2d2d2d",
+                        "input-dark": "#2A2A2A",
+                    },
+                    fontFamily: { "display":["Lexend", "sans-serif"] }
+                }
+            }
+        }
+    </script>
+    <style> 
+        body { font-family: 'Lexend', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .font-variation-settings-fill { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        
+        /* Custom Select Arrow Hide */
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+    </style>
+</head>
+<body class="bg-black text-white antialiased selection:bg-primary selection:text-white flex justify-center min-h-screen">
+
+<!-- Mobile App Container -->
+<div class="w-full max-w-md bg-background-dark h-[100dvh] flex flex-col relative shadow-2xl overflow-hidden border-x border-card-border/30">
+    
+    <!-- Header Section -->
+    <header class="flex-shrink-0 z-50 bg-background-dark px-5 py-4 flex items-center justify-between border-b border-card-border">
+        <a href="/profile" class="flex size-10 items-center justify-center rounded-full hover:bg-input-dark text-white transition-colors">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <h2 class="text-[18px] font-bold text-white tracking-tight">Edit Profile</h2>
+        <button id="save-btn" class="flex h-9 px-4 items-center justify-center rounded-full bg-primary/20 text-primary font-semibold hover:bg-primary/30 transition-colors text-sm">
+            Save
+        </button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto no-scrollbar pb-28 pt-6">
+        
+        <!-- Loader during data fetch -->
+        <div id="full-loader" class="absolute inset-0 bg-background-dark z-40 flex flex-col items-center justify-center hidden">
+            <div class="w-8 h-8 border-4 border-white border-t-primary rounded-full animate-spin mb-2"></div>
+            <p class="text-gray-400 text-sm font-medium">Please wait...</p>
+        </div>
+
+        <div class="flex flex-col px-5">
+            
+            <!-- Avatar Edit Section -->
+            <div class="flex flex-col items-center mb-8">
+                <div class="relative group cursor-pointer" id="change-photo-btn">
+                    <input type="file" id="profile-image-input" class="hidden" accept="image/*" />
+                    <div class="relative h-28 w-28 rounded-full bg-background-dark flex items-center justify-center border-[3px] border-primary">
+                        <img id="profile-avatar" src="https://ui-avatars.com/api/?name=Loading&background=22C55E&color=fff" alt="Profile avatar" class="h-full w-full rounded-full object-cover"/>
+                        
+                        <!-- Upload Loader -->
+                        <div id="avatar-loader" class="absolute inset-0 bg-black/70 rounded-full flex flex-col items-center justify-center hidden">
+                            <div class="w-6 h-6 border-2 border-white border-t-primary rounded-full animate-spin"></div>
+                        </div>
+                    </div>
+                    <div class="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white shadow-md border-2 border-background-dark group-hover:bg-primary-dark transition-colors">
+                        <span class="material-symbols-outlined text-[16px]">photo_camera</span>
+                    </div>
+                </div>
+                <p id="change-photo-text" class="mt-4 text-primary font-semibold text-[15px] cursor-pointer hover:text-primary-dark transition-colors">Change Profile Photo</p>
+            </div>
+
+            <!-- Form Fields based on Auth Data -->
+            <div class="space-y-5">
+                
+                <!-- Full Name -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[14px] font-medium text-gray-400 ml-1" for="fullName">Full Name</label>
+                    <div class="relative">
+                        <input class="w-full rounded-2xl bg-surface-light border border-transparent focus:border-primary focus:ring-1 focus:ring-primary text-white placeholder-gray-500 py-3.5 pl-11 pr-4 outline-none transition-all" id="fullName" type="text" placeholder="Enter your full name"/>
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                            <span class="material-symbols-outlined text-[20px]">person</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Username -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[14px] font-medium text-gray-400 ml-1" for="username">Username</label>
+                    <div class="relative">
+                        <input class="w-full rounded-2xl bg-surface-light border border-transparent focus:border-primary focus:ring-1 focus:ring-primary text-white placeholder-gray-500 py-3.5 pl-11 pr-4 outline-none transition-all" id="username" type="text" placeholder="Enter a username"/>
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                            <span class="material-symbols-outlined text-[20px]">alternate_email</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Education Level -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[14px] font-medium text-gray-400 ml-1" for="educationLevel">Education Level</label>
+                    <div class="relative">
+                        <select class="w-full rounded-2xl bg-surface-light border border-transparent focus:border-primary focus:ring-1 focus:ring-primary text-white py-3.5 px-4 pr-10 outline-none transition-all" id="educationLevel">
+                            <option value="HSC">Higher Secondary (HSC)</option>
+                            <option value="SSC">Secondary (SSC)</option>
+                            <option value="A-Levels">A-Levels</option>
+                            <option value="O-Levels">O-Levels</option>
+                            <option value="University">University</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                            <span class="material-symbols-outlined text-[20px]">expand_more</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Class / Year -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[14px] font-medium text-gray-400 ml-1" for="classYear">Class / Year</label>
+                    <div class="relative">
+                        <select class="w-full rounded-2xl bg-surface-light border border-transparent focus:border-primary focus:ring-1 focus:ring-primary text-white py-3.5 px-4 pr-10 outline-none transition-all" id="classYear">
+                            <option value="11">1st Year (XI)</option>
+                            <option value="12">2nd Year (XII)</option>
+                            <option value="Admission">Admission Candidate</option>
+                            <option value="9">Class 9</option>
+                            <option value="10">Class 10</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                            <span class="material-symbols-outlined text-[20px]">expand_more</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Institution Name -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[14px] font-medium text-gray-400 ml-1" for="institution">Institution Name</label>
+                    <div class="relative">
+                        <input class="w-full rounded-2xl bg-surface-light border border-transparent focus:border-primary focus:ring-1 focus:ring-primary text-white placeholder-gray-500 py-3.5 pl-11 pr-4 outline-none transition-all" id="institution" type="text" placeholder="e.g. Notre Dame College"/>
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                            <span class="material-symbols-outlined text-[20px]">school</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Focus Subjects Container -->
+                <div class="flex flex-col gap-1.5 pt-2">
+                    <label class="text-[14px] font-medium text-gray-400 ml-1">Focus Subjects</label>
+                    <div id="subject-container" class="flex flex-wrap gap-2 mt-1">
+                        <!-- Dynamic Subjects will be injected here via JS -->
+                    </div>
+                </div>
+
+                <!-- Primary Goal -->
+                <div class="flex flex-col gap-1.5 pt-2">
+                    <label class="text-[14px] font-medium text-gray-400 ml-1" for="goal">Primary Goal</label>
+                    <div class="relative">
+                        <select class="w-full rounded-2xl bg-surface-light border border-transparent focus:border-primary focus:ring-1 focus:ring-primary text-white py-3.5 pl-11 pr-10 outline-none transition-all" id="goal">
+                            <option value="University">University - Admission Prep</option>
+                            <option value="Exam Score">Exam Score - Board Results</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                            <span class="material-symbols-outlined text-[20px]">flag</span>
+                        </div>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                            <span class="material-symbols-outlined text-[20px]">expand_more</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="absolute bottom-0 left-0 right-0 bg-surface-light border-t border-card-border pb-6 pt-3 px-6 flex justify-between items-end z-50">
+        <a class="flex flex-col items-center justify-end gap-1.5 text-gray-400 group hover:text-gray-200 transition-colors" href="/dashboard">
+            <div class="h-8 flex items-center justify-center transition-transform group-active:scale-90">
+                <span class="material-symbols-outlined text-[28px]">home</span>
+            </div>
+            <p class="text-[10px] font-medium leading-none">Home</p>
+        </a>
+        <a class="flex flex-col items-center justify-end gap-1.5 text-gray-400 group hover:text-gray-200 transition-colors" href="#">
+            <div class="h-8 flex items-center justify-center transition-transform group-active:scale-90">
+                <span class="material-symbols-outlined text-[28px]">calendar_month</span>
+            </div>
+            <p class="text-[10px] font-medium leading-none">Calendar</p>
+        </a>
+        <a class="flex flex-col items-center justify-end gap-1.5 text-gray-400 group hover:text-gray-200 transition-colors" href="/groups">
+            <div class="h-8 flex items-center justify-center transition-transform group-active:scale-90">
+                <span class="material-symbols-outlined text-[28px]">groups</span>
+            </div>
+            <p class="text-[10px] font-medium leading-none">Groups</p>
+        </a>
+        <a class="flex flex-col items-center justify-end gap-1.5 text-gray-400 group hover:text-gray-200 transition-colors" href="#">
+            <div class="h-8 flex items-center justify-center transition-transform group-active:scale-90">
+                <span class="material-symbols-outlined text-[28px]">smart_toy</span>
+            </div>
+            <p class="text-[10px] font-medium leading-none">AI</p>
+        </a>
+        <a class="flex flex-col items-center justify-end gap-1.5 text-primary group" href="/profile">
+            <div class="h-8 flex items-center justify-center transition-transform group-active:scale-90">
+                <span class="material-symbols-outlined text-[28px] font-variation-settings-fill">person</span>
+            </div>
+            <p class="text-[10px] font-medium leading-none">Profile</p>
+        </a>
+    </nav>
+</div>
+
+<!-- Firebase & Logic Script -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDofDHfJvIKQmTtlg7x99mBtimuMmUUhBY",
+        authDomain: "facebook-379b3.firebaseapp.com",
+        projectId: "facebook-379b3",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const imgbbApiKey = "957a2f2e8fc22269da1f2045b3f25eab";
+    let currentUserUid = null;
+    let currentPhotoURL = ""; 
+
+    // Focus Subjects Logic (Same as Auth)
+    const subjectsList =["Physics", "Higher Math", "Chemistry", "Biology", "ICT", "English", "Accounting", "Finance"];
+    let selectedSubjects =[];
+
+    // UI Elements
+    const fullLoader = document.getElementById("full-loader");
+    const saveBtn = document.getElementById("save-btn");
+    
+    const inputFullName = document.getElementById("fullName");
+    const inputUsername = document.getElementById("username");
+    const inputEducationLevel = document.getElementById("educationLevel");
+    const inputClassYear = document.getElementById("classYear");
+    const inputInstitution = document.getElementById("institution");
+    const inputGoal = document.getElementById("goal");
+    
+    const profileAvatarEl = document.getElementById("profile-avatar");
+    const imageInput = document.getElementById("profile-image-input");
+    const changePhotoBtn = document.getElementById("change-photo-btn");
+    const changePhotoText = document.getElementById("change-photo-text");
+    const avatarLoader = document.getElementById("avatar-loader");
+    const subjectContainer = document.getElementById("subject-container");
+
+    // Check Auth State and Load Data
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            currentUserUid = user.uid;
+            await loadUserData(user.uid);
+        } else {
+            window.location.href = "/auth"; 
+        }
+    });
+
+    // Render Subjects Function
+    function renderSubjects() {
+        subjectContainer.innerHTML = '';
+        subjectsList.forEach(sub => {
+            const isSelected = selectedSubjects.includes(sub);
+            const btn = document.createElement('button');
+            btn.type = "button";
+            btn.className = isSelected 
+                ? "flex items-center gap-1.5 rounded-full border border-primary bg-primary/10 px-4 py-2 text-[13px] font-bold text-primary transition-colors"
+                : "flex items-center gap-1.5 rounded-full border border-transparent bg-input-dark px-4 py-2 text-[13px] font-medium text-gray-300 hover:bg-[#353535] transition-colors";
+            btn.innerHTML = isSelected ? `<span class="material-symbols-outlined text-[16px] font-bold">check</span>${sub}` : sub;
+            btn.onclick = () => {
+                if(isSelected) selectedSubjects = selectedSubjects.filter(s => s !== sub);
+                else selectedSubjects.push(sub);
+                renderSubjects(); // Re-render on click
+            };
+            subjectContainer.appendChild(btn);
+        });
+    }
+
+    // Fetch existing user data
+    async function loadUserData(uid) {
+        fullLoader.classList.remove("hidden");
+        try {
+            const userDocRef = doc(db, "users", uid);
+            const userDoc = await getDoc(userDocRef);
+            
+            if (userDoc.exists()) {
+                const data = userDoc.data();
+                
+                inputFullName.value = data.fullName || "";
+                inputUsername.value = data.username || "";
+                inputInstitution.value = data.institution || "";
+                
+                // Map Selects
+                if (data.educationLevel) inputEducationLevel.value = data.educationLevel;
+                if (data.classYear) inputClassYear.value = data.classYear;
+                if (data.primaryGoal) inputGoal.value = data.primaryGoal;
+
+                // Load existing subjects
+                selectedSubjects = data.focusSubjects ||[];
+                renderSubjects();
+
+                // Profile Image
+                currentPhotoURL = data.photoURL || `https://ui-avatars.com/api/?name=${data.fullName || 'User'}&background=22C55E&color=fff`;
+                profileAvatarEl.src = currentPhotoURL;
+            }
+        } catch (error) {
+            console.error("Error loading profile data:", error);
+        } finally {
+            fullLoader.classList.add("hidden");
+        }
+    }
+
+    // Handle Image Upload Selection
+    changePhotoBtn.addEventListener("click", () => imageInput.click());
+    changePhotoText.addEventListener("click", () => imageInput.click());
+
+    imageInput.addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        avatarLoader.classList.remove("hidden");
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            // Upload to ImgBB instantly so preview generates real URL
+            const response = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                currentPhotoURL = data.data.url;
+                profileAvatarEl.src = currentPhotoURL;
+            } else {
+                alert("Failed to upload image. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error uploading image:", error);
+            alert("Upload failed. Check your internet connection.");
+        } finally {
+            avatarLoader.classList.add("hidden");
+        }
+    });
+
+    // Save Button Logic
+    saveBtn.addEventListener("click", async () => {
+        if (!currentUserUid) return;
+
+        if (selectedSubjects.length === 0) {
+            alert("Please select at least one focus subject.");
+            return;
+        }
+
+        // Change button state to saving
+        saveBtn.innerText = "Saving...";
+        saveBtn.disabled = true;
+        saveBtn.classList.add("opacity-70", "cursor-not-allowed");
+
+        try {
+            const userDocRef = doc(db, "users", currentUserUid);
+            
+            // Collect all updated data exactly matching Auth properties
+            const updatedData = {
+                fullName: inputFullName.value.trim(),
+                username: inputUsername.value.trim(),
+                educationLevel: inputEducationLevel.value,
+                classYear: inputClassYear.value,
+                institution: inputInstitution.value.trim(),
+                focusSubjects: selectedSubjects,
+                primaryGoal: inputGoal.value,
+                photoURL: currentPhotoURL
+            };
+
+            await updateDoc(userDocRef, updatedData);
+            
+            // Redirect back to profile folder on success
+            window.location.href = "/profile"; 
+            
+        } catch (error) {
+            console.error("Error updating profile:", error);
+            alert("Failed to update profile.");
+            
+            // Reset button
+            saveBtn.innerText = "Save";
+            saveBtn.disabled = false;
+            saveBtn.classList.remove("opacity-70", "cursor-not-allowed");
+        }
+    });
+
+</script>
+</body>
+</html>
