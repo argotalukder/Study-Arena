@@ -51,7 +51,42 @@
         </div>
     </div>
 
-    <main class="flex-1 px-4 py-4 space-y-6 pb-24">
+    <!-- Skeleton Loader (Shown initially) -->
+    <div id="page-loader" class="flex-1 px-4 py-4 space-y-6 pb-24 animate-pulse">
+        <!-- Timer Card Skeleton -->
+        <div class="rounded-2xl bg-surface-dark p-6 border border-white/5 h-[300px]">
+            <div class="flex justify-between items-start mb-8">
+                <div>
+                    <div class="h-3 w-20 bg-input-dark rounded mb-2"></div>
+                    <div class="h-6 w-40 bg-input-dark rounded"></div>
+                </div>
+                <div class="h-8 w-8 rounded-full bg-input-dark"></div>
+            </div>
+            <div class="flex flex-col items-center py-4 mb-6">
+                <div class="h-16 w-64 bg-input-dark rounded-xl"></div>
+            </div>
+            <div class="flex gap-3">
+                <div class="flex-1 h-12 bg-input-dark rounded-xl"></div>
+                <div class="h-12 w-12 bg-input-dark rounded-xl"></div>
+            </div>
+        </div>
+        
+        <!-- Subjects Header Skeleton -->
+        <div class="flex justify-between items-end mb-4">
+            <div class="h-5 w-32 bg-input-dark rounded"></div>
+            <div class="h-3 w-16 bg-input-dark rounded"></div>
+        </div>
+
+        <!-- Subjects List Skeleton -->
+        <div class="space-y-3">
+            <div class="h-20 bg-surface-dark rounded-xl border border-white/5"></div>
+            <div class="h-20 bg-surface-dark rounded-xl border border-white/5"></div>
+            <div class="h-20 bg-surface-dark rounded-xl border border-white/5"></div>
+        </div>
+    </div>
+
+    <!-- Main Content (Hidden initially) -->
+    <main id="main-content" class="hidden flex-1 px-4 py-4 space-y-6 pb-24">
         <!-- Timer Card -->
         <div class="relative overflow-hidden rounded-2xl bg-surface-dark text-white shadow-lg p-6 border border-white/5">
             <div class="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent pointer-events-none"></div>
@@ -91,7 +126,7 @@
         
         <!-- Dynamic Subjects List -->
         <div class="space-y-3" id="subject-list-container">
-            <div class="text-center text-gray-500 py-4">Loading subjects...</div>
+            <!-- Subjects injected here -->
         </div>
 
         <!-- Pomodoro Toggle -->
@@ -175,6 +210,8 @@
         const playText = document.getElementById('play-text');
         const subjectTitle = document.getElementById('current-subject');
         const subjectListContainer = document.getElementById('subject-list-container');
+        const loader = document.getElementById('page-loader');
+        const mainContent = document.getElementById('main-content');
 
         // Check Auth and Load Subjects
         onAuthStateChanged(auth, async (user) => {
@@ -200,9 +237,16 @@
                         selectSubject(subjects[0]);
                     }
                 }
+                
+                // Hide Loader & Show Content
+                loader.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+
             } catch (error) {
                 console.error("Error loading subjects:", error);
                 subjectListContainer.innerHTML = '<p class="text-center text-red-500">Failed to load subjects</p>';
+                loader.classList.add('hidden');
+                mainContent.classList.remove('hidden');
             }
         }
 

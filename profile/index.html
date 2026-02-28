@@ -21,7 +21,7 @@
                         "card-border": "#2d2d2d",
                         "input-dark": "#2A2A2A",
                     },
-                    fontFamily: { "display": ["Lexend", "sans-serif"] }
+                    fontFamily: { "display":["Lexend", "sans-serif"] }
                 }
             }
         }
@@ -52,10 +52,69 @@
     <!-- Main Content -->
     <main class="flex-1 overflow-y-auto no-scrollbar pb-28">
         
-        <!-- Global Loader inside Main -->
-        <div id="profile-loader" class="flex flex-col items-center justify-center py-20">
-            <div class="w-10 h-10 border-4 border-card-border border-t-primary rounded-full animate-spin mb-4"></div>
-            <span class="text-sm font-medium text-gray-400">Loading Profile...</span>
+        <!-- Global Loader inside Main (Professional Skeleton) -->
+        <div id="profile-loader" class="flex flex-col w-full animate-pulse pb-10">
+            <!-- Profile Avatar & Info Skeleton -->
+            <div class="flex flex-col items-center px-5 pt-8 pb-6">
+                <div class="h-28 w-28 rounded-full bg-input-dark mb-5 border-2 border-surface-light"></div>
+                <div class="h-6 w-48 bg-surface-light rounded mb-2 mt-1"></div>
+                <div class="h-4 w-32 bg-surface-light rounded"></div>
+            </div>
+
+            <!-- Stats Grid Skeleton -->
+            <div class="grid grid-cols-3 gap-3 px-5 mb-8">
+                <div class="flex flex-col items-center gap-2 rounded-3xl bg-surface-light p-4 border border-card-border">
+                    <div class="w-10 h-10 rounded-full bg-input-dark mb-1"></div>
+                    <div class="w-10 h-6 bg-input-dark rounded"></div>
+                    <div class="w-16 h-3 bg-input-dark rounded"></div>
+                </div>
+                <div class="flex flex-col items-center gap-2 rounded-3xl bg-surface-light p-4 border border-card-border">
+                    <div class="w-10 h-10 rounded-full bg-input-dark mb-1"></div>
+                    <div class="w-10 h-6 bg-input-dark rounded"></div>
+                    <div class="w-16 h-3 bg-input-dark rounded"></div>
+                </div>
+                <div class="flex flex-col items-center gap-2 rounded-3xl bg-surface-light p-4 border border-card-border">
+                    <div class="w-10 h-10 rounded-full bg-input-dark mb-1"></div>
+                    <div class="w-10 h-6 bg-input-dark rounded"></div>
+                    <div class="w-16 h-3 bg-input-dark rounded"></div>
+                </div>
+            </div>
+
+            <!-- My Subjects Skeleton -->
+            <div class="px-5 mb-8">
+                <div class="w-24 h-5 bg-surface-light rounded mb-3"></div>
+                <div class="flex flex-wrap gap-2.5">
+                    <div class="w-20 h-7 bg-surface-light rounded-xl"></div>
+                    <div class="w-16 h-7 bg-surface-light rounded-xl"></div>
+                    <div class="w-24 h-7 bg-surface-light rounded-xl"></div>
+                    <div class="w-7 h-7 bg-surface-light rounded-full border border-dashed border-gray-500"></div>
+                </div>
+            </div>
+
+            <!-- Info List Skeleton -->
+            <div class="mx-5 mb-8 overflow-hidden rounded-3xl bg-surface-light border border-card-border">
+                <div class="flex items-center gap-3 border-b border-card-border p-4">
+                    <div class="h-10 w-10 rounded-xl bg-input-dark flex-shrink-0"></div>
+                    <div class="flex flex-col gap-1.5 flex-1">
+                        <div class="w-24 h-3 bg-input-dark rounded"></div>
+                        <div class="w-32 h-4 bg-input-dark rounded"></div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 border-b border-card-border p-4">
+                    <div class="h-10 w-10 rounded-xl bg-input-dark flex-shrink-0"></div>
+                    <div class="flex flex-col gap-1.5 flex-1">
+                        <div class="w-20 h-3 bg-input-dark rounded"></div>
+                        <div class="w-40 h-4 bg-input-dark rounded"></div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 p-4">
+                    <div class="h-10 w-10 rounded-xl bg-input-dark flex-shrink-0"></div>
+                    <div class="flex flex-col gap-1.5 flex-1">
+                        <div class="w-16 h-3 bg-input-dark rounded"></div>
+                        <div class="w-28 h-4 bg-input-dark rounded"></div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Profile Content (Hidden until loaded) -->

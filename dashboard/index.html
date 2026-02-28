@@ -30,19 +30,67 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .font-variation-settings-fill { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #22C55E; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="bg-black text-white antialiased selection:bg-primary selection:text-white flex justify-center min-h-screen">
 
     <!-- Mobile App Container -->
-    <div class="w-full max-w-md bg-background-dark min-h-[100dvh] flex flex-col relative shadow-2xl overflow-hidden border-x border-card-border/30">
+    <div class="w-full max-w-md bg-background-dark h-[100dvh] flex flex-col relative shadow-2xl overflow-hidden border-x border-card-border/30">
 
-        <!-- Global Loader -->
-        <div id="global-loader" class="absolute inset-0 z-[100] bg-background-dark flex flex-col items-center justify-center">
-            <div class="loader mb-4"></div>
-            <p class="text-gray-400 font-medium text-sm">Loading Dashboard...</p>
+        <!-- Global Loader (Professional Skeleton Loading) -->
+        <div id="global-loader" class="absolute inset-0 z-[100] bg-background-dark flex flex-col pt-4 px-5 overflow-hidden">
+            <!-- Header Skeleton -->
+            <div class="flex items-center justify-between pb-4 border-b border-card-border mb-5">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-surface-light rounded-full animate-pulse"></div>
+                    <div class="flex flex-col gap-2">
+                        <div class="w-16 h-2.5 bg-surface-light rounded animate-pulse"></div>
+                        <div class="w-24 h-4 bg-surface-light rounded animate-pulse"></div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 bg-surface-light rounded-full animate-pulse"></div>
+                    <div class="w-10 h-10 bg-surface-light rounded-full animate-pulse"></div>
+                </div>
+            </div>
+            
+            <!-- Main Content Skeleton -->
+            <div class="flex flex-col gap-6">
+                <!-- Goal Card Skeleton -->
+                <div class="w-full h-[140px] bg-surface-light rounded-3xl animate-pulse"></div>
+                
+                <!-- Stats Grid Skeleton -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="h-36 bg-surface-light rounded-3xl animate-pulse"></div>
+                    <div class="h-36 bg-surface-light rounded-3xl animate-pulse"></div>
+                </div>
+                
+                <!-- Active Session Skeleton -->
+                <div class="w-full h-24 bg-surface-light rounded-3xl animate-pulse"></div>
+                
+                <!-- Quick Access Skeleton -->
+                <div>
+                    <div class="w-32 h-4 bg-surface-light rounded mb-4 animate-pulse"></div>
+                    <div class="grid grid-cols-4 gap-3">
+                        <div class="flex flex-col items-center gap-2.5">
+                            <div class="h-14 w-14 bg-surface-light rounded-2xl animate-pulse"></div>
+                            <div class="w-10 h-2 bg-surface-light rounded animate-pulse"></div>
+                        </div>
+                        <div class="flex flex-col items-center gap-2.5">
+                            <div class="h-14 w-14 bg-surface-light rounded-2xl animate-pulse"></div>
+                            <div class="w-10 h-2 bg-surface-light rounded animate-pulse"></div>
+                        </div>
+                        <div class="flex flex-col items-center gap-2.5">
+                            <div class="h-14 w-14 bg-surface-light rounded-2xl animate-pulse"></div>
+                            <div class="w-10 h-2 bg-surface-light rounded animate-pulse"></div>
+                        </div>
+                        <div class="flex flex-col items-center gap-2.5">
+                            <div class="h-14 w-14 bg-surface-light rounded-2xl animate-pulse"></div>
+                            <div class="w-10 h-2 bg-surface-light rounded animate-pulse"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Header Section -->
@@ -55,14 +103,13 @@
                 </a>
                 <div>
                     <p id="greeting-text" class="text-[11px] text-gray-400 font-medium uppercase tracking-wider mb-0.5">Good Morning,</p>
-                    <h2 id="user-name" class="text-white text-[17px] font-bold leading-tight truncate max-w-[140px]">Welcome 👋</h2>
+                    <h2 id="user-name" class="text-white text-[17px] font-bold leading-tight pr-2">Welcome 👋</h2>
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <!-- LINK FIXED HERE: Added href="/notifications" and changed button to a tag -->
                 <a href="/notifications" class="bg-surface-light h-10 w-10 flex items-center justify-center rounded-full shadow-sm text-gray-300 hover:text-white hover:bg-card-border transition-colors relative border border-card-border">
                     <span class="material-symbols-outlined text-[22px]">notifications</span>
-                    <span class="absolute top-2.5 right-2.5 h-2 w-2 bg-red-500 rounded-full border border-surface-light"></span>
+                    <span id="notification-badge" class="absolute top-1.5 right-1.5 hidden h-4 w-4 items-center justify-center bg-red-500 rounded-full border border-surface-light text-[9px] font-bold text-white"></span>
                 </a>
                 <button id="logout-btn" class="bg-surface-light h-10 w-10 flex items-center justify-center rounded-full shadow-sm text-red-400 hover:bg-red-500/10 transition-colors border border-card-border" title="Logout">
                     <span class="material-symbols-outlined text-[20px]">logout</span>
@@ -222,7 +269,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, query, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDofDHfJvIKQmTtlg7x99mBtimuMmUUhBY",
@@ -248,6 +295,7 @@
         const focusedTimeText = document.getElementById('focused-time');
         const todaysGoalText = document.getElementById('todays-goal');
         const logoutBtn = document.getElementById('logout-btn');
+        const notificationBadge = document.getElementById('notification-badge');
 
         function setGreeting() {
             const hour = new Date().getHours();
@@ -268,6 +316,7 @@
             if (user) {
                 setGreeting();
                 try {
+                    // Fetch User Info
                     const userDoc = await getDoc(doc(db, "users", user.uid));
                     if (userDoc.exists()) {
                         const userData = userDoc.data();
@@ -280,6 +329,7 @@
                         }
                     }
 
+                    // Listen to User Stats
                     const statsRef = doc(db, "users", user.uid, "stats", "summary");
                     onSnapshot(statsRef, (docSnap) => {
                         if (docSnap.exists()) {
@@ -292,6 +342,22 @@
                         }
                     });
 
+                    // Listen to Unread Notifications
+                    const notifRef = collection(db, "users", user.uid, "notifications");
+                    const notifQuery = query(notifRef, where("read", "==", false));
+                    onSnapshot(notifQuery, (snapshot) => {
+                        const count = snapshot.size;
+                        if (count > 0) {
+                            notificationBadge.innerText = count > 9 ? '9+' : count;
+                            notificationBadge.classList.remove('hidden');
+                            notificationBadge.classList.add('flex');
+                        } else {
+                            notificationBadge.classList.add('hidden');
+                            notificationBadge.classList.remove('flex');
+                        }
+                    });
+
+                    // Hide Loader & Show Content
                     loader.classList.add('hidden');
                     mainContent.classList.remove('hidden');
 

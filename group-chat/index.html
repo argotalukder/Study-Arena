@@ -110,9 +110,15 @@
                 <!-- Group Image -->
                 <img id="group-image" src="https://ui-avatars.com/api/?name=Group&background=22C55E&color=fff" class="w-10 h-10 rounded-full object-cover border border-gray-700 cursor-pointer flex-shrink-0" onclick="goToGroupInfo()" alt="Group DP">
                 
-                <div class="flex flex-col justify-center cursor-pointer" onclick="goToGroupInfo()">
-                    <h1 id="chat-title" class="text-[16px] font-bold text-white leading-tight truncate max-w-[150px]">Loading...</h1>
-                    <p id="chat-subtitle" class="text-[11px] text-gray-400 font-medium">Connecting...</p>
+                <div class="flex flex-col justify-center cursor-pointer min-w-[120px]" onclick="goToGroupInfo()">
+                    <!-- Header Title Skeleton Animation -->
+                    <h1 id="chat-title" class="text-[16px] font-bold text-white leading-tight truncate max-w-[150px]">
+                        <span class="inline-block w-24 h-4 bg-gray-700 rounded animate-pulse mb-0.5 mt-0.5"></span>
+                    </h1>
+                    <!-- Header Subtitle Skeleton Animation -->
+                    <p id="chat-subtitle" class="text-[11px] text-gray-400 font-medium">
+                        <span class="inline-block w-16 h-2.5 bg-gray-700 rounded animate-pulse mt-0.5"></span>
+                    </p>
                 </div>
             </div>
             <div class="flex gap-2">
@@ -136,8 +142,37 @@
 
         <!-- Messages Area -->
         <main id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-5 bg-background-dark no-scrollbar pb-40">
-            <!-- Messages will load here -->
-            <div class="flex justify-center mt-4"><div class="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div></div>
+            <!-- Professional Skeleton Loading for Messages -->
+            <div class="flex flex-col gap-5 w-full mt-2 animate-pulse">
+                <!-- Skeleton Left -->
+                <div class="flex items-end gap-3 w-full">
+                    <div class="w-8 h-8 rounded-full bg-surface-dark flex-shrink-0"></div>
+                    <div class="flex flex-col gap-1.5 w-[65%]">
+                        <div class="w-16 h-2.5 bg-surface-dark rounded ml-1"></div>
+                        <div class="h-12 bg-surface-dark rounded-[1.2rem] rounded-bl-none"></div>
+                    </div>
+                </div>
+                <!-- Skeleton Right -->
+                <div class="flex items-end gap-3 w-full justify-end">
+                    <div class="flex flex-col gap-1 w-[55%] items-end">
+                        <div class="h-10 w-full bg-surface-dark rounded-[1.2rem] rounded-br-none"></div>
+                    </div>
+                </div>
+                <!-- Skeleton Left -->
+                <div class="flex items-end gap-3 w-full">
+                    <div class="w-8 h-8 rounded-full bg-surface-dark flex-shrink-0"></div>
+                    <div class="flex flex-col gap-1.5 w-[45%]">
+                        <div class="w-20 h-2.5 bg-surface-dark rounded ml-1"></div>
+                        <div class="h-16 bg-surface-dark rounded-[1.2rem] rounded-bl-none"></div>
+                    </div>
+                </div>
+                <!-- Skeleton Right -->
+                <div class="flex items-end gap-3 w-full justify-end">
+                    <div class="flex flex-col gap-1 w-[70%] items-end">
+                        <div class="h-14 w-full bg-surface-dark rounded-[1.2rem] rounded-br-none"></div>
+                    </div>
+                </div>
+            </div>
         </main>
 
         <!-- Bottom Section (Input + Nav) -->
@@ -362,8 +397,7 @@
                     // Logic to mark message as SEEN
                     const seenByMap = msg.seenBy || {};
                     if (!isOwn && !seenByMap[currentUser.uid]) {
-                        updateDoc(docSnap.ref, {
-                            [`seenBy.${currentUser.uid}`]: currentUserData.fullName ? currentUserData.fullName.split(' ')[0] : "User"
+                        updateDoc(docSnap.ref, {[`seenBy.${currentUser.uid}`]: currentUserData.fullName ? currentUserData.fullName.split(' ')[0] : "User"
                         }).catch(e => console.log("Error updating seen status", e));
                     }
 
@@ -426,8 +460,7 @@
             if(!isTyping && msgInput.value.trim() !== "") {
                 isTyping = true;
                 setDoc(doc(db, "groups", groupId), {
-                    typing: {
-                        [currentUser.uid]: currentUserData.fullName ? currentUserData.fullName.split(' ')[0] : "User"
+                    typing: {[currentUser.uid]: currentUserData.fullName ? currentUserData.fullName.split(' ')[0] : "User"
                     }
                 }, { merge: true }).catch(e => console.error("Typing update error", e));
             }

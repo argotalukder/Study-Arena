@@ -69,103 +69,180 @@
         <!-- Main Content -->
         <main class="flex-1 overflow-y-auto no-scrollbar bg-background-dark pb-24">
             
-            <!-- Group Header Info -->
-            <div class="flex flex-col items-center pt-8 pb-6 px-4">
-                <div class="relative group cursor-pointer" id="group-icon-container">
-                    <div id="group-icon" class="w-24 h-24 rounded-full bg-input-bar bg-center bg-cover border-4 border-surface-dark shadow-lg mb-4 flex items-center justify-center text-primary relative overflow-hidden">
-                        <span class="material-symbols-outlined text-4xl">groups</span>
-                        <!-- Loading Overlay for Upload -->
-                        <div id="upload-loader" class="hidden absolute inset-0 bg-black/60 flex items-center justify-center">
-                            <div class="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            <!-- SKELETON LOADER (Shown initially) -->
+            <div id="page-loader" class="flex flex-col w-full animate-pulse">
+                <!-- Header Info Skeleton -->
+                <div class="flex flex-col items-center pt-8 pb-6 px-4">
+                    <div class="w-24 h-24 rounded-full bg-input-bar border-4 border-surface-dark mb-4"></div>
+                    <div class="h-6 w-48 bg-input-bar rounded mb-2"></div>
+                    <div class="h-4 w-32 bg-input-bar rounded mb-6"></div>
+                    
+                    <div class="flex gap-4 w-full justify-center">
+                        <div class="flex flex-col items-center gap-1">
+                            <div class="w-10 h-10 rounded-full bg-input-bar"></div>
+                            <div class="h-2 w-8 bg-input-bar rounded mt-1"></div>
+                        </div>
+                        <div class="flex flex-col items-center gap-1">
+                            <div class="w-10 h-10 rounded-full bg-input-bar"></div>
+                            <div class="h-2 w-8 bg-input-bar rounded mt-1"></div>
+                        </div>
+                        <div class="flex flex-col items-center gap-1">
+                            <div class="w-10 h-10 rounded-full bg-input-bar"></div>
+                            <div class="h-2 w-8 bg-input-bar rounded mt-1"></div>
                         </div>
                     </div>
-                    <!-- Admin Edit Icon Overlay -->
-                    <div id="admin-icon-edit" class="hidden absolute bottom-4 right-0 w-8 h-8 bg-surface-dark rounded-full border border-gray-700 flex items-center justify-center hover:bg-input-bar transition-colors text-gray-300 z-10 shadow-md">
-                        <span class="material-symbols-outlined text-[16px]">photo_camera</span>
+                </div>
+                <div class="h-2 bg-surface-dark/50 border-y border-input-bar"></div>
+                <!-- About Skeleton -->
+                <div class="px-5 py-5">
+                    <div class="h-4 w-24 bg-input-bar rounded mb-3"></div>
+                    <div class="h-3 w-full bg-input-bar rounded mb-2"></div>
+                    <div class="h-3 w-2/3 bg-input-bar rounded"></div>
+                </div>
+                <div class="h-px bg-input-bar mx-5"></div>
+                <!-- Media Skeleton -->
+                <div class="px-5 py-5">
+                    <div class="flex justify-between mb-3">
+                        <div class="h-4 w-24 bg-input-bar rounded"></div>
+                        <div class="h-3 w-10 bg-input-bar rounded"></div>
+                    </div>
+                    <div class="grid grid-cols-4 gap-2">
+                        <div class="aspect-square bg-input-bar rounded-lg"></div>
+                        <div class="aspect-square bg-input-bar rounded-lg"></div>
+                        <div class="aspect-square bg-input-bar rounded-lg"></div>
+                        <div class="aspect-square bg-input-bar rounded-lg"></div>
                     </div>
                 </div>
-                <h2 id="group-name" class="text-xl font-bold text-white mb-1 text-center">Loading...</h2>
-                <p id="group-meta" class="text-sm text-gray-400">Loading details...</p>
-                
-                <div class="flex gap-4 mt-6 w-full justify-center">
-                    <button class="flex flex-col items-center gap-1 group">
-                        <div class="w-10 h-10 rounded-full bg-input-bar flex items-center justify-center text-primary group-active:scale-95 transition-transform">
-                            <span class="material-symbols-outlined">notifications</span>
+                <div class="h-2 bg-surface-dark/50 border-y border-input-bar"></div>
+                <!-- Members Skeleton -->
+                <div class="px-5 py-3">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="h-4 w-20 bg-input-bar rounded"></div>
+                        <div class="w-8 h-8 rounded-full bg-input-bar"></div>
+                    </div>
+                    <div class="flex flex-col gap-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-input-bar"></div>
+                            <div class="flex-1">
+                                <div class="h-3 w-32 bg-input-bar rounded mb-1.5"></div>
+                                <div class="h-2 w-16 bg-input-bar rounded"></div>
+                            </div>
                         </div>
-                        <span class="text-xs text-gray-400">Mute</span>
-                    </button>
-                    <button class="flex flex-col items-center gap-1 group">
-                        <div class="w-10 h-10 rounded-full bg-input-bar flex items-center justify-center text-primary group-active:scale-95 transition-transform">
-                            <span class="material-symbols-outlined">search</span>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-input-bar"></div>
+                            <div class="flex-1">
+                                <div class="h-3 w-24 bg-input-bar rounded mb-1.5"></div>
+                                <div class="h-2 w-12 bg-input-bar rounded"></div>
+                            </div>
                         </div>
-                        <span class="text-xs text-gray-400">Search</span>
-                    </button>
-                    <button class="flex flex-col items-center gap-1 group">
-                        <div class="w-10 h-10 rounded-full bg-input-bar flex items-center justify-center text-primary group-active:scale-95 transition-transform">
-                            <span class="material-symbols-outlined">share</span>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-input-bar"></div>
+                            <div class="flex-1">
+                                <div class="h-3 w-28 bg-input-bar rounded mb-1.5"></div>
+                                <div class="h-2 w-14 bg-input-bar rounded"></div>
+                            </div>
                         </div>
-                        <span class="text-xs text-gray-400">Share</span>
-                    </button>
+                    </div>
                 </div>
             </div>
 
-            <div class="h-2 bg-surface-dark/50 border-y border-input-bar"></div>
-
-            <!-- About Section -->
-            <div class="px-5 py-5">
-                <h3 class="text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wide">About Group</h3>
-                <p id="group-desc" class="text-sm text-gray-400 leading-relaxed">No description provided.</p>
-            </div>
-
-            <div class="h-px bg-input-bar mx-5"></div>
-
-            <!-- Shared Media Section -->
-            <div class="px-5 py-5">
-                <div class="flex items-center justify-between mb-3">
-                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wide">Shared Media</h3>
-                    <button id="see-all-media-btn" class="text-xs text-primary font-medium hover:underline">See All</button>
-                </div>
-                <div id="shared-media-container" class="grid grid-cols-4 gap-2">
-                    <div class="aspect-square bg-input-bar rounded-lg flex items-center justify-center text-gray-600 animate-pulse"></div>
-                    <div class="aspect-square bg-input-bar rounded-lg flex items-center justify-center text-gray-600 animate-pulse"></div>
-                    <div class="aspect-square bg-input-bar rounded-lg flex items-center justify-center text-gray-600 animate-pulse"></div>
-                    <div class="aspect-square bg-input-bar rounded-lg flex items-center justify-center text-gray-600 animate-pulse"></div>
-                </div>
-            </div>
-
-            <div class="h-2 bg-surface-dark/50 border-y border-input-bar"></div>
-
-            <!-- Members List -->
-            <div class="px-0 py-2">
-                <div class="px-5 py-3 flex flex-col gap-2">
-                    <div class="flex items-center justify-between">
-                        <h3 id="member-header" class="text-sm font-semibold text-gray-300 uppercase tracking-wide">Members</h3>
-                        <button id="toggle-search-btn" class="w-8 h-8 rounded-full hover:bg-input-bar flex items-center justify-center text-gray-500 hover:text-white transition-colors">
-                            <span class="material-symbols-outlined text-[20px]">search</span>
+            <!-- REAL CONTENT CONTAINER (Hidden initially) -->
+            <div id="content-loaded" class="hidden">
+                <!-- Group Header Info -->
+                <div class="flex flex-col items-center pt-8 pb-6 px-4">
+                    <div class="relative group cursor-pointer" id="group-icon-container">
+                        <div id="group-icon" class="w-24 h-24 rounded-full bg-input-bar bg-center bg-cover border-4 border-surface-dark shadow-lg mb-4 flex items-center justify-center text-primary relative overflow-hidden">
+                            <span class="material-symbols-outlined text-4xl">groups</span>
+                            <!-- Loading Overlay for Upload -->
+                            <div id="upload-loader" class="hidden absolute inset-0 bg-black/60 flex items-center justify-center">
+                                <div class="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            </div>
+                        </div>
+                        <!-- Admin Edit Icon Overlay -->
+                        <div id="admin-icon-edit" class="hidden absolute bottom-4 right-0 w-8 h-8 bg-surface-dark rounded-full border border-gray-700 flex items-center justify-center hover:bg-input-bar transition-colors text-gray-300 z-10 shadow-md">
+                            <span class="material-symbols-outlined text-[16px]">photo_camera</span>
+                        </div>
+                    </div>
+                    <h2 id="group-name" class="text-xl font-bold text-white mb-1 text-center">Loading...</h2>
+                    <p id="group-meta" class="text-sm text-gray-400">Loading details...</p>
+                    
+                    <div class="flex gap-4 mt-6 w-full justify-center">
+                        <button class="flex flex-col items-center gap-1 group">
+                            <div class="w-10 h-10 rounded-full bg-input-bar flex items-center justify-center text-primary group-active:scale-95 transition-transform">
+                                <span class="material-symbols-outlined">notifications</span>
+                            </div>
+                            <span class="text-xs text-gray-400">Mute</span>
+                        </button>
+                        <button class="flex flex-col items-center gap-1 group">
+                            <div class="w-10 h-10 rounded-full bg-input-bar flex items-center justify-center text-primary group-active:scale-95 transition-transform">
+                                <span class="material-symbols-outlined">search</span>
+                            </div>
+                            <span class="text-xs text-gray-400">Search</span>
+                        </button>
+                        <button class="flex flex-col items-center gap-1 group">
+                            <div class="w-10 h-10 rounded-full bg-input-bar flex items-center justify-center text-primary group-active:scale-95 transition-transform">
+                                <span class="material-symbols-outlined">share</span>
+                            </div>
+                            <span class="text-xs text-gray-400">Share</span>
                         </button>
                     </div>
-                    <!-- Hidden Search Input -->
-                    <input type="text" id="member-search-input" placeholder="Search members..." class="hidden w-full bg-input-bar text-white text-sm px-4 py-2.5 rounded-xl border border-gray-800 focus:outline-none focus:border-primary transition-colors mb-2">
                 </div>
-                
-                <div id="members-list" class="flex flex-col">
-                    <div class="flex justify-center py-4"><div class="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div></div>
+
+                <div class="h-2 bg-surface-dark/50 border-y border-input-bar"></div>
+
+                <!-- About Section -->
+                <div class="px-5 py-5">
+                    <h3 class="text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wide">About Group</h3>
+                    <p id="group-desc" class="text-sm text-gray-400 leading-relaxed">No description provided.</p>
                 </div>
-            </div>
 
-            <div class="h-2 bg-surface-dark/50 border-y border-input-bar"></div>
+                <div class="h-px bg-input-bar mx-5"></div>
 
-            <!-- Exit Actions -->
-            <div class="px-0 py-2 pb-8">
-                <button id="group-settings-btn" class="w-full flex items-center px-5 py-3.5 hover:bg-input-bar transition-colors gap-3 group">
-                    <span class="material-symbols-outlined text-gray-400 group-hover:text-primary transition-colors">settings</span>
-                    <span class="text-sm text-white font-medium flex-1 text-left">Group Settings</span>
-                    <span class="material-symbols-outlined text-gray-600 text-sm">arrow_forward_ios</span>
-                </button>
-                <button id="leave-btn" class="w-full flex items-center px-5 py-3.5 hover:bg-input-bar transition-colors gap-3 group">
-                    <span class="material-symbols-outlined text-red-500 transition-colors">logout</span>
-                    <span class="text-sm text-red-500 font-medium flex-1 text-left">Leave Group</span>
-                </button>
+                <!-- Shared Media Section -->
+                <div class="px-5 py-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wide">Shared Media</h3>
+                        <button id="see-all-media-btn" class="text-xs text-primary font-medium hover:underline">See All</button>
+                    </div>
+                    <div id="shared-media-container" class="grid grid-cols-4 gap-2">
+                        <!-- Media items will be injected here -->
+                    </div>
+                </div>
+
+                <div class="h-2 bg-surface-dark/50 border-y border-input-bar"></div>
+
+                <!-- Members List -->
+                <div class="px-0 py-2">
+                    <div class="px-5 py-3 flex flex-col gap-2">
+                        <div class="flex items-center justify-between">
+                            <h3 id="member-header" class="text-sm font-semibold text-gray-300 uppercase tracking-wide">Members</h3>
+                            <button id="toggle-search-btn" class="w-8 h-8 rounded-full hover:bg-input-bar flex items-center justify-center text-gray-500 hover:text-white transition-colors">
+                                <span class="material-symbols-outlined text-[20px]">search</span>
+                            </button>
+                        </div>
+                        <!-- Hidden Search Input -->
+                        <input type="text" id="member-search-input" placeholder="Search members..." class="hidden w-full bg-input-bar text-white text-sm px-4 py-2.5 rounded-xl border border-gray-800 focus:outline-none focus:border-primary transition-colors mb-2">
+                    </div>
+                    
+                    <div id="members-list" class="flex flex-col">
+                        <!-- Member items injected here -->
+                    </div>
+                </div>
+
+                <div class="h-2 bg-surface-dark/50 border-y border-input-bar"></div>
+
+                <!-- Exit Actions -->
+                <div class="px-0 py-2 pb-8">
+                    <button id="group-settings-btn" class="w-full flex items-center px-5 py-3.5 hover:bg-input-bar transition-colors gap-3 group">
+                        <span class="material-symbols-outlined text-gray-400 group-hover:text-primary transition-colors">settings</span>
+                        <span class="text-sm text-white font-medium flex-1 text-left">Group Settings</span>
+                        <span class="material-symbols-outlined text-gray-600 text-sm">arrow_forward_ios</span>
+                    </button>
+                    <button id="leave-btn" class="w-full flex items-center px-5 py-3.5 hover:bg-input-bar transition-colors gap-3 group">
+                        <span class="material-symbols-outlined text-red-500 transition-colors">logout</span>
+                        <span class="text-sm text-red-500 font-medium flex-1 text-left">Leave Group</span>
+                    </button>
+                </div>
             </div>
         </main>
 
@@ -314,6 +391,10 @@
                     iconEl.style.backgroundImage = `url('${data.groupIcon || data.image}')`;
                     iconEl.innerHTML = `<div id="upload-loader" class="hidden absolute inset-0 bg-black/60 flex items-center justify-center"><div class="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div></div>`;
                 }
+
+                // Hide Loader & Show Content
+                document.getElementById("page-loader").classList.add("hidden");
+                document.getElementById("content-loaded").classList.remove("hidden");
 
                 // --- Admin Controls ---
                 const adminEditBtn = document.getElementById("admin-edit-btn");
